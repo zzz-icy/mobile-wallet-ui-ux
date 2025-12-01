@@ -1,5 +1,5 @@
-import React from 'react';
-import { Shield, CheckCircle, ArrowRight, Plus, Sparkles, Lock } from 'lucide-react';
+import { Shield, ArrowRight, Plus, Lock } from 'lucide-react';
+import appIcon from './appicon-512.png';
 
 export default function OnboardingWelcome() {
   return (
@@ -7,15 +7,19 @@ export default function OnboardingWelcome() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-center">
-          <div className="text-sm font-semibold text-gray-900">Welcome to iDen2</div>
+          <div className="text-sm font-semibold text-gray-900">Welcome to XXXX</div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
         {/* Welcome Icon/Illustration */}
-        <div className="w-24 h-24 bg-violet-100 rounded-full flex items-center justify-center mb-6">
-          <Sparkles className="w-12 h-12 text-violet-600" />
+        <div className="mb-6 flex items-center justify-center">
+          <img
+            src={appIcon}
+            alt="iden2 App Icon"
+            className="w-28 h-28 rounded-3xl"
+          />
         </div>
 
         {/* Welcome Title */}

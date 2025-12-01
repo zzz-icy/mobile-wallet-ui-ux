@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 import OnboardingWelcome from './OnboardingWelcome';
 import SelectiveDisclosureDemo from './SelectiveDisclosureDemo';
