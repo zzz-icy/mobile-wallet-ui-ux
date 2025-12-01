@@ -1,0 +1,1066 @@
+import React, { useState } from 'react';
+import { Check, ChevronDown, Shield, Info, AlertCircle, Clock, Plus, X } from 'lucide-react';
+
+type Source = {
+  id: string;
+  name: string;
+  value: string;
+  derived?: boolean;
+  expired?: boolean;
+  oldData?: boolean;
+  expiringSoon?: boolean;
+  partial?: boolean;
+  issueDate?: string;
+  expiredDate?: string;
+  expiryDate?: string;
+  partialNote?: string;
+  calculatedFrom?: string;
+  validDespiteExpiry?: boolean;
+  recommended?: boolean;
+};
+
+type Field = {
+  id: string;
+  label: string;
+  sources: Source[];
+  required: boolean;
+  description: string;
+  privacyPreserving?: boolean;
+  missing?: boolean;
+  sensitive?: boolean;
+  overSharing?: boolean;
+  newRequest?: boolean;
+  previouslyShared?: boolean;
+  hasConflict?: boolean;
+  isPartialMatch?: boolean;
+  unchangingData?: boolean;
+  hasMultipleIdentities?: boolean;
+  lessPrivate?: boolean;
+  derived?: boolean;
+};
+
+type Scenario = {
+  name: string;
+  verifier: {
+    name: string;
+    purpose: string;
+    icon: string;
+  };
+  fields: Field[];
+  excessiveRequest?: boolean;
+  previouslyShared?: {
+    date: string;
+    fields: string[];
+  };
+};
+
+type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'conflicting-data' | 'missing-required' | 'partial-data' | 'expired-still-valid' | 'oversharing-warning' | 'expiring-soon' | 'derived-calculated' | 'multiple-identities' | 'excessive-fields' | 'previous-sharing';
+
+export default function SelectiveDisclosureDemo() {
+  const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('age-verification');
+  const [selectedFields, setSelectedFields] = useState<Record<string, boolean>>({});
+  const [selectedSources, setSelectedSources] = useState<Record<string, string>>({});
+  const [expandedField, setExpandedField] = useState<string | null>(null);
+  const [showScenarios, setShowScenarios] = useState(false);
+
+  const scenarios: Record<ScenarioKey, Scenario> = {
+    'age-verification': {
+      name: 'Age Verification',
+      verifier: {
+        name: "Downtown Bar & Lounge",
+        purpose: "Age Verification",
+        icon: "🍺"
+      },
+      fields: [
+        { 
+          id: 'ageVerification', 
+          label: 'Age Verification (Over 21)', 
+          sources: [
+            { id: 'derived-passport', name: 'Derived from Passport DOB', value: 'Verified: Over 21 ✓', derived: true },
+            { id: 'derived-drivers', name: "Derived from Driver's License DOB", value: 'Verified: Over 21 ✓', derived: true }
+          ],
+          required: true,
+          description: 'Prove you meet minimum age',
+          privacyPreserving: true
+        },
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
+          ],
+          required: false,
+          description: 'Optional for their records'
+        },
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
+          ],
+          required: false,
+          description: 'Alternative - they can calculate from this'
+        }
+      ]
+    },
+    'address-verification': {
+      name: 'Address Verification',
+      verifier: {
+        name: "QuickShip Delivery",
+        purpose: "Delivery Address Verification",
+        icon: "📦"
+      },
+      fields: [
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Required for package recipient'
+        },
+        { 
+          id: 'fullAddress', 
+          label: 'Full Address', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' },
+            { id: 'utility', name: "Utility Bill", value: '123 Main St, Austin, TX 78701' }
+          ],
+          required: true,
+          description: 'Required for delivery location'
+        },
+        { 
+          id: 'phoneNumber', 
+          label: 'Phone Number', 
+          sources: [
+            { id: 'contact', name: "Contact Info", value: '(512) 555-0123' }
+          ],
+          required: false,
+          description: 'Optional for delivery notifications'
+        }
+      ]
+    },
+    'expired-credential': {
+      name: '⚠️ Edge: Expired Credential',
+      verifier: {
+        name: "Airport Security TSA",
+        purpose: "Identity Verification",
+        icon: "✈️"
+      },
+      fields: [
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'passport', name: "Passport", value: 'Sami Kandur', expired: true },
+            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur', expired: false }
+          ],
+          required: true,
+          description: 'Required for boarding pass match'
+        },
+        { 
+          id: 'photo', 
+          label: 'Photo ID', 
+          sources: [
+            { id: 'passport', name: "Passport", value: 'Photo available', expired: true },
+            { id: 'drivers', name: "Driver's License", value: 'Photo available', expired: false }
+          ],
+          required: true,
+          description: 'Current photo ID required'
+        },
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'passport', name: "Passport", value: 'March 15, 1996', expired: true },
+            { id: 'drivers', name: "Driver's License", value: 'March 15, 1996', expired: false }
+          ],
+          required: true,
+          description: 'Required for identity verification'
+        }
+      ]
+    },
+    'conflicting-data': {
+      name: '⚠️ Edge: Conflicting Data',
+      verifier: {
+        name: "State DMV",
+        purpose: "Address Update Verification",
+        icon: "🚗"
+      },
+      fields: [
+        { 
+          id: 'currentAddress', 
+          label: 'Current Address', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: '123 Old St, Austin, TX 78701', issueDate: 'Issued: Jan 2023' },
+            { id: 'utility', name: "Utility Bill", value: '456 New Ave, Austin, TX 78702', issueDate: 'Dated: Nov 2025' },
+            { id: 'lease', name: "Lease Agreement", value: '456 New Ave, Austin, TX 78702', issueDate: 'Signed: Oct 2025' }
+          ],
+          required: true,
+          description: 'Current residential address',
+          hasConflict: true
+        },
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Name on record'
+        }
+      ]
+    },
+    'missing-required': {
+      name: '⚠️ Edge: Missing Required Field',
+      verifier: {
+        name: "International Conference",
+        purpose: "Professional Registration",
+        icon: "🎤"
+      },
+      fields: [
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Required for badge printing'
+        },
+        { 
+          id: 'professionalLicense', 
+          label: 'Professional License Number', 
+          sources: [],
+          required: true,
+          description: 'Required to verify professional status',
+          missing: true
+        },
+        { 
+          id: 'organization', 
+          label: 'Organization/Company', 
+          sources: [
+            { id: 'linkedin', name: 'LinkedIn', value: 'Acme Corp' }
+          ],
+          required: false,
+          description: 'Optional for networking'
+        }
+      ]
+    },
+    'partial-data': {
+      name: '⚠️ Edge: Partial Data Available',
+      verifier: {
+        name: "Online Retailer",
+        purpose: "Account Verification",
+        icon: "🛒"
+      },
+      fields: [
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'manual', name: 'Manually Combined', value: 'Sami Kandur', partial: true, partialNote: 'Combined from First Name + Last Name fields' }
+          ],
+          required: true,
+          description: 'Required for account registration',
+          isPartialMatch: true
+        },
+        { 
+          id: 'email', 
+          label: 'Email Address', 
+          sources: [
+            { id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }
+          ],
+          required: true,
+          description: 'Required for account access'
+        },
+        { 
+          id: 'phoneNumber', 
+          label: 'Phone Number', 
+          sources: [
+            { id: 'contact', name: 'Contact Info', value: '(512) 555-0123' }
+          ],
+          required: false,
+          description: 'Optional for order updates'
+        }
+      ]
+    },
+    'expired-still-valid': {
+      name: '⚠️ Edge: Expired but Data Valid',
+      verifier: {
+        name: "Ancestry Research Service",
+        purpose: "Identity Verification",
+        icon: "🌳"
+      },
+      fields: [
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
+          ],
+          required: true,
+          description: 'Required for genealogy records',
+          unchangingData: true
+        },
+        { 
+          id: 'birthplace', 
+          label: 'Place of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Austin, Texas, USA', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
+          ],
+          required: true,
+          description: 'Required for family tree verification',
+          unchangingData: true
+        },
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Required for account identification'
+        }
+      ]
+    },
+    'oversharing-warning': {
+      name: '⚠️ Edge: Over-sharing Risk',
+      verifier: {
+        name: "Nightclub 21+",
+        purpose: "Age Verification Only",
+        icon: "🎵"
+      },
+      fields: [
+        { 
+          id: 'ageVerification', 
+          label: 'Age Verification (Over 21)', 
+          sources: [
+            { id: 'derived', name: 'Derived from DOB', value: 'Verified: Over 21 ✓', derived: true, recommended: true }
+          ],
+          required: true,
+          description: 'Prove you meet minimum age',
+          privacyPreserving: true
+        },
+        { 
+          id: 'exactAge', 
+          label: 'Exact Age', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: '28 years' }
+          ],
+          required: false,
+          description: 'Not required for entry',
+          overSharing: true
+        },
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
+          ],
+          required: false,
+          description: 'Not required for entry',
+          overSharing: true
+        },
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
+          ],
+          required: false,
+          description: 'Optional for guest list',
+          overSharing: false
+        }
+      ]
+    },
+    'expiring-soon': {
+      name: '⚠️ Edge: Credential Expiring Soon',
+      verifier: {
+        name: "Car Rental Agency",
+        purpose: "Driver License Verification",
+        icon: "🚙"
+      },
+      fields: [
+        { 
+          id: 'driversLicense', 
+          label: "Driver's License Number", 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'DL-12345678', expiringSoon: true, expiryDate: 'Expires: Dec 10, 2025' }
+          ],
+          required: true,
+          description: 'Required for vehicle rental'
+        },
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Required for rental agreement'
+        },
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: 'March 15, 1996' }
+          ],
+          required: true,
+          description: 'Required for age verification (25+)'
+        }
+      ]
+    },
+    'derived-calculated': {
+      name: '⚠️ Edge: Derived/Calculated Field',
+      verifier: {
+        name: "Movie Theater",
+        purpose: "Senior Discount Eligibility",
+        icon: "🎬"
+      },
+      fields: [
+        { 
+          id: 'seniorStatus', 
+          label: 'Senior Status (65+)', 
+          sources: [
+            { id: 'derived', name: 'Calculated from DOB', value: 'Not eligible (Age: 28)', derived: true, calculatedFrom: 'Date of Birth' }
+          ],
+          required: true,
+          description: 'Verify eligibility for senior discount',
+          privacyPreserving: true
+        },
+        { 
+          id: 'alternativeProof', 
+          label: 'Alternative: Share Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
+          ],
+          required: false,
+          description: 'They can calculate from this',
+          lessPrivate: true
+        }
+      ]
+    },
+    'multiple-identities': {
+      name: '⚠️ Edge: Multiple Identities',
+      verifier: {
+        name: "Banking Institution",
+        purpose: "Account Opening",
+        icon: "🏦"
+      },
+      fields: [
+        { 
+          id: 'legalName', 
+          label: 'Legal Name', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' },
+            { id: 'marriage', name: 'Marriage Certificate', value: 'Sami Johnson' }
+          ],
+          required: true,
+          description: 'Must match government ID',
+          hasMultipleIdentities: true
+        },
+        { 
+          id: 'dateOfBirth', 
+          label: 'Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
+          ],
+          required: true,
+          description: 'Required for identity verification'
+        },
+        { 
+          id: 'address', 
+          label: 'Current Address', 
+          sources: [
+            { id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' }
+          ],
+          required: true,
+          description: 'Required for correspondence'
+        }
+      ]
+    },
+    'excessive-fields': {
+      name: '⚠️ Edge: Too Many Required Fields',
+      verifier: {
+        name: "Suspicious Data Broker",
+        purpose: "Data Collection",
+        icon: "⚠️"
+      },
+      excessiveRequest: true,
+      fields: [
+        { id: 'fullName', label: 'Full Name', sources: [{ id: 'passport', name: 'Passport', value: 'Sami Kandur' }], required: true, description: 'Required field 1/12' },
+        { id: 'dateOfBirth', label: 'Date of Birth', sources: [{ id: 'passport', name: 'Passport', value: 'March 15, 1996' }], required: true, description: 'Required field 2/12' },
+        { id: 'ssn', label: 'Social Security Number', sources: [{ id: 'ssn', name: 'SSN Card', value: '***-**-1234' }], required: true, description: 'Required field 3/12', sensitive: true },
+        { id: 'address', label: 'Home Address', sources: [{ id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' }], required: true, description: 'Required field 4/12' },
+        { id: 'phone', label: 'Phone Number', sources: [{ id: 'contact', name: 'Contact Info', value: '(512) 555-0123' }], required: true, description: 'Required field 5/12' },
+        { id: 'email', label: 'Email Address', sources: [{ id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }], required: true, description: 'Required field 6/12' },
+        { id: 'employer', label: 'Current Employer', sources: [{ id: 'employment', name: 'Employment Record', value: 'Acme Corp' }], required: true, description: 'Required field 7/12' },
+        { id: 'salary', label: 'Annual Salary', sources: [{ id: 'tax', name: 'Tax Return', value: '$125,400' }], required: true, description: 'Required field 8/12', sensitive: true },
+        { id: 'credit', label: 'Credit Score', sources: [{ id: 'credit', name: 'Credit Report', value: '775' }], required: true, description: 'Required field 9/12', sensitive: true },
+        { id: 'bank', label: 'Bank Account Number', sources: [{ id: 'bank', name: 'Bank Statement', value: '****1234' }], required: true, description: 'Required field 10/12', sensitive: true },
+        { id: 'medical', label: 'Medical History', sources: [], required: true, description: 'Required field 11/12', missing: true, sensitive: true },
+        { id: 'biometric', label: 'Fingerprint Data', sources: [], required: true, description: 'Required field 12/12', missing: true, sensitive: true }
+      ]
+    },
+    'previous-sharing': {
+      name: '⚠️ Edge: Previously Shared Different Data',
+      verifier: {
+        name: "Coffee Shop Rewards",
+        purpose: "Loyalty Program Check-in",
+        icon: "☕"
+      },
+      previouslyShared: {
+        date: 'Last visit: Nov 15, 2025',
+        fields: ['Full Name', 'Phone Number']
+      },
+      fields: [
+        { 
+          id: 'fullName', 
+          label: 'Full Name', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
+          ],
+          required: true,
+          description: 'Required for rewards account',
+          previouslyShared: true
+        },
+        { 
+          id: 'email', 
+          label: 'Email Address', 
+          sources: [
+            { id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }
+          ],
+          required: true,
+          description: 'Required for digital receipts',
+          previouslyShared: false,
+          newRequest: true
+        },
+        { 
+          id: 'phoneNumber', 
+          label: 'Phone Number', 
+          sources: [
+            { id: 'contact', name: 'Contact Info', value: '(512) 555-0123' }
+          ],
+          required: false,
+          description: 'Optional for order notifications',
+          previouslyShared: true
+        }
+      ]
+    }
+  };
+
+  const currentData = scenarios[currentScenario];
+
+  // Helper function to check if source selection is needed
+  const needsSourceSelection = (field: Field) => {
+    if (field.sources.length <= 1) return false;
+    
+    // Check for expired credentials
+    const hasExpired = field.sources.some(s => s.expired);
+    if (hasExpired) return true;
+    
+    // Check for conflicting data
+    if (field.hasConflict) return true;
+    
+    // Check if values differ across sources
+    const values = field.sources.map(s => s.value);
+    const uniqueValues = [...new Set(values)];
+    if (uniqueValues.length > 1) return true;
+    
+    return false;
+  };
+
+  const toggleField = (fieldId: string) => {
+    const field = currentData.fields.find((f: Field) => f.id === fieldId);
+    if (!field || field.required || field.missing) return;
+    
+    setSelectedFields(prev => ({
+      ...prev,
+      [fieldId]: !prev[fieldId]
+    }));
+  };
+
+  const selectSource = (fieldId: string, sourceId: string) => {
+    setSelectedSources(prev => ({
+      ...prev,
+      [fieldId]: sourceId
+    }));
+    setExpandedField(null);
+  };
+
+  const changeScenario = (scenarioKey: ScenarioKey) => {
+    setCurrentScenario(scenarioKey);
+    setSelectedFields({});
+    setSelectedSources({});
+    setExpandedField(null);
+    setShowScenarios(false);
+  };
+
+  // Auto-select required fields and default sources
+  React.useEffect(() => {
+    const required: Record<string, boolean> = {};
+    const defaultSources: Record<string, string> = {};
+    currentData.fields.forEach((field: Field) => {
+      if (field.required && !field.missing) {
+        required[field.id] = true;
+      }
+      // Select first non-expired, non-old source by default
+      const validSource = field.sources.find((s: Source) => !s.expired && !s.oldData) || field.sources[0];
+      if (validSource) {
+        defaultSources[field.id] = validSource.id;
+      }
+    });
+    setSelectedFields(prev => ({ ...prev, ...required }));
+    setSelectedSources(prev => ({ ...prev, ...defaultSources }));
+  }, [currentScenario]);
+
+  const selectedCount = Object.values(selectedFields).filter(Boolean).length;
+  const hasMissingRequired = currentData.fields.some((f: Field) => f.required && f.missing);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showScenarios && !target.closest('.scenario-dropdown-container')) {
+        setShowScenarios(false);
+      }
+    };
+
+    if (showScenarios) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showScenarios]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto">
+      {/* Demo Controls */}
+      <div className="scenario-dropdown-container bg-gray-800 px-4 py-3 border-b-2 border-yellow-400 relative z-50">
+        <div className="text-xs text-yellow-400 font-bold mb-1 flex items-center gap-2">
+          <span>⚙️ DEMO CONTROLS (NOT PART OF ACTUAL UI)</span>
+        </div>
+        <button
+          onClick={() => setShowScenarios(!showScenarios)}
+          className="w-full flex items-center justify-between text-white bg-gray-700 rounded-lg px-3 py-2 hover:bg-gray-600 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{currentData.verifier.icon}</span>
+            <div className="text-left">
+              <div className="text-xs opacity-75">Switch Scenario:</div>
+              <div className="text-sm font-semibold">{currentData.name}</div>
+            </div>
+          </div>
+          <ChevronDown className={`w-5 h-5 transition-transform ${showScenarios ? 'rotate-180' : ''}`} />
+        </button>
+
+        {showScenarios && (
+          <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto z-50 border border-gray-200">
+            {Object.entries(scenarios).map(([key, scenario]) => (
+              <button
+                key={key}
+                onClick={() => changeScenario(key as ScenarioKey)}
+                className={`w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-gray-50 transition-colors ${
+                  key === currentScenario ? 'bg-violet-50' : ''
+                }`}
+              >
+                <span className="text-xl">{scenario.verifier.icon}</span>
+                <div className="flex-1">
+                  <div className={`text-sm font-medium ${key === currentScenario ? 'text-violet-900' : 'text-gray-900'}`}>
+                    {scenario.name}
+                  </div>
+                  <div className="text-xs text-gray-500">{scenario.verifier.name}</div>
+                </div>
+                {key === currentScenario && (
+                  <Check className="w-5 h-5 text-violet-600" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <button className="text-violet-600 text-sm font-medium">Cancel</button>
+          <div className="text-sm font-semibold text-gray-900">Share Information</div>
+          <div className="w-14"></div>
+        </div>
+      </div>
+
+      {/* Request Info Card */}
+      <div className="bg-white mx-4 mt-4 rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="flex items-start gap-3">
+          <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Shield className="w-6 h-6 text-violet-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 text-base">{currentData.verifier.name}</h3>
+            <p className="text-sm text-gray-500 mt-0.5">Requesting: {currentData.verifier.purpose}</p>
+            <div className="mt-3 bg-violet-50 rounded-lg px-3 py-2 flex items-start gap-2">
+              <Info className="w-4 h-4 text-violet-600 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-violet-900">You can choose what to share. Only required fields are mandatory.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Excessive Request Warning */}
+      {currentData.excessiveRequest && (
+        <div className="mx-4 mt-4 bg-red-50 border-2 border-red-300 rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-bold text-red-900 text-base">⚠️ Privacy Alert: Excessive Data Request</h4>
+              <p className="text-sm text-red-800 mt-2 font-medium">
+                This verifier is asking for {currentData.fields.filter((f: Field) => f.required).length} required fields, including highly sensitive information.
+              </p>
+              <p className="text-xs text-red-700 mt-2">
+                Consider whether this much information is truly necessary for their stated purpose. Legitimate services rarely need this much data.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button className="text-xs font-semibold text-red-700 bg-red-100 px-3 py-1.5 rounded-lg hover:bg-red-200">
+                  Deny Request
+                </button>
+                <button className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200">
+                  Report Verifier
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Previous Sharing Notice */}
+      {currentData.previouslyShared && (
+        <div className="mx-4 mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-blue-900 text-sm">You've shared with them before</h4>
+              <p className="text-xs text-blue-700 mt-1">
+                {currentData.previouslyShared.date} • You shared: {currentData.previouslyShared.fields.join(', ')}
+              </p>
+              <p className="text-xs text-blue-600 mt-2">
+                {currentData.fields.some((f: Field) => f.newRequest) && '📌 This request includes new fields not previously shared.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Missing Required Fields Warning */}
+      {hasMissingRequired && (
+        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-red-900 text-sm">Missing Required Information</h4>
+              <p className="text-xs text-red-700 mt-1">
+                This verifier requires credentials you don't have in your wallet. You'll need to add them before continuing.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Selectable Fields */}
+      <div className="flex-1 px-4 mt-6 pb-4">
+        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 px-1">
+          {hasMissingRequired ? 'Available Information' : 'Select Information to Share'}
+        </h4>
+        
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+          {currentData.fields.map((field: Field, index: number) => {
+            const selectedSource = field.sources.find((s: Source) => s.id === selectedSources[field.id]);
+            const isExpanded = expandedField === field.id;
+            const showSourceSelector = needsSourceSelection(field);
+            const hasExpired = selectedSource?.expired;
+            
+            // Missing field rendering
+            if (field.missing) {
+              return (
+                <div key={field.id}>
+                  <div className="px-4 py-4 bg-red-50">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-lg border-2 border-red-300 flex items-center justify-center flex-shrink-0 bg-white">
+                        <X className="w-4 h-4 text-red-500" strokeWidth={2.5} />
+                      </div>
+
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900 text-sm">{field.label}</span>
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-medium">
+                            Required
+                          </span>
+                          {field.sensitive && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md font-medium">
+                              Sensitive
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-red-700 font-medium mt-0.5">Not in your wallet</p>
+                        <p className="text-xs text-red-600 mt-1">{field.description}</p>
+                        
+                        <button className="mt-3 flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-700">
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add this credential</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  {index < currentData.fields.length - 1 && (
+                    <div className="border-b border-gray-100 mx-4"></div>
+                  )}
+                </div>
+              );
+            }
+            
+            return (
+              <div key={field.id}>
+                <div className="px-4 py-4">
+                  {/* Main Field Row */}
+                  <div className="flex items-center gap-3">
+                    {/* Checkbox */}
+                    <button
+                      onClick={() => toggleField(field.id)}
+                      disabled={field.required}
+                      className="flex-shrink-0"
+                    >
+                      <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                        selectedFields[field.id] 
+                          ? 'bg-violet-600 border-violet-600' 
+                          : 'border-gray-300'
+                      } ${field.required ? 'opacity-50' : ''}`}>
+                        {selectedFields[field.id] && (
+                          <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Field Info */}
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-gray-900 text-sm">{field.label}</span>
+                        {field.required && (
+                          <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-md font-medium">
+                            Required
+                          </span>
+                        )}
+                        {field.sensitive && (
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md font-medium">
+                            Sensitive
+                          </span>
+                        )}
+                        {field.derived && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-md font-medium">
+                            Privacy-Preserving
+                          </span>
+                        )}
+                        {field.overSharing && (
+                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">
+                            ⚠️ Shares More
+                          </span>
+                        )}
+                        {field.newRequest && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-medium">
+                            🆕 New Field
+                          </span>
+                        )}
+                        {field.previouslyShared && (
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+                            Previously Shared
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-900 mt-0.5">{selectedSource?.value}</p>
+                      <p className="text-xs text-gray-500 mt-1">{field.description}</p>
+                      
+                      {/* Special warnings/notes */}
+                      {field.isPartialMatch && (
+                        <div className="mt-2 flex items-center gap-1 text-blue-600">
+                          <Info className="w-3 h-3" />
+                          <span className="text-xs font-medium">Automatically combined from separate fields</span>
+                        </div>
+                      )}
+                      
+                      {field.unchangingData && selectedSource?.expired && (
+                        <div className="mt-2 flex items-center gap-1 text-amber-600">
+                          <Info className="w-3 h-3" />
+                          <span className="text-xs font-medium">Credential expired, but this data doesn't change</span>
+                        </div>
+                      )}
+                      
+                      {field.overSharing && !field.required && (
+                        <div className="mt-2 flex items-center gap-1 text-amber-600">
+                          <AlertCircle className="w-3 h-3" />
+                          <span className="text-xs font-medium">Not required - sharing this reduces your privacy</span>
+                        </div>
+                      )}
+                      
+                      {field.hasMultipleIdentities && (
+                        <div className="mt-2 flex items-center gap-1 text-blue-600">
+                          <AlertCircle className="w-3 h-3" />
+                          <span className="text-xs font-medium">Choose which legal name to share</span>
+                        </div>
+                      )}
+                      
+                      {/* Warning for expired credential */}
+                      {hasExpired && !field.unchangingData && (
+                        <div className="mt-2 flex items-center gap-1 text-red-600">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-xs font-medium">Selected credential is expired - choose current one</span>
+                        </div>
+                      )}
+                      
+                      {/* Warning for conflicting data */}
+                      {field.hasConflict && (
+                        <div className="mt-2 flex items-center gap-1 text-amber-600">
+                          <AlertCircle className="w-3 h-3" />
+                          <span className="text-xs font-medium">Different addresses found - select the correct one</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Source Selector - ONLY show when needed */}
+                  {showSourceSelector && (
+                    <div className="mt-3 ml-9">
+                      <button
+                        onClick={() => setExpandedField(isExpanded ? null : field.id)}
+                        className="w-full bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 flex items-center justify-between hover:bg-amber-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600" />
+                          <span className="text-xs font-medium text-amber-900">Choose source:</span>
+                          <span className="text-sm font-medium text-gray-900">{selectedSource?.name}</span>
+                          {selectedSource?.expired && (
+                            <span className="text-xs bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded font-medium">
+                              Expired
+                            </span>
+                          )}
+                          {selectedSource?.oldData && (
+                            <span className="text-xs bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded font-medium">
+                              Old
+                            </span>
+                          )}
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-amber-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {/* Source Options */}
+                      {isExpanded && (
+                        <div className="mt-2 space-y-1">
+                          {field.sources.map((source: Source) => (
+                            <button
+                              key={source.id}
+                              onClick={() => selectSource(field.id, source.id)}
+                              className={`w-full px-3 py-2.5 rounded-lg flex items-start justify-between transition-colors ${
+                                selectedSources[field.id] === source.id
+                                  ? 'bg-violet-50 border border-violet-200'
+                                  : 'bg-white border border-gray-200 hover:bg-gray-50'
+                              }`}
+                            >
+                              <div className="flex flex-col gap-1 text-left flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className={`text-sm font-medium ${
+                                    selectedSources[field.id] === source.id
+                                      ? 'text-violet-900'
+                                      : 'text-gray-700'
+                                  }`}>
+                                    {source.name}
+                                  </span>
+                                  {source.expired && !field.unchangingData && (
+                                    <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      Expired
+                                    </span>
+                                  )}
+                                  {source.expired && field.unchangingData && (
+                                    <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                                      <Info className="w-3 h-3" />
+                                      Expired (Data Valid)
+                                    </span>
+                                  )}
+                                  {source.expiringSoon && (
+                                    <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      Expires Soon
+                                    </span>
+                                  )}
+                                  {source.partial && (
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">
+                                      Combined
+                                    </span>
+                                  )}
+                                  {source.derived && (
+                                    <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
+                                      Privacy+
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-xs text-gray-600">{source.value}</span>
+                                {source.issueDate && (
+                                  <span className="text-xs text-gray-500">{source.issueDate}</span>
+                                )}
+                                {source.expiredDate && (
+                                  <span className="text-xs text-gray-500">{source.expiredDate}</span>
+                                )}
+                                {source.expiryDate && (
+                                  <span className="text-xs text-amber-600 font-medium">{source.expiryDate}</span>
+                                )}
+                                {source.partialNote && (
+                                  <span className="text-xs text-blue-600">{source.partialNote}</span>
+                                )}
+                                {source.calculatedFrom && (
+                                  <span className="text-xs text-green-600">Calculated from {source.calculatedFrom}</span>
+                                )}
+                              </div>
+                              {selectedSources[field.id] === source.id && (
+                                <Check className="w-4 h-4 text-violet-600 flex-shrink-0 mt-1" strokeWidth={2.5} />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {index < currentData.fields.length - 1 && (
+                  <div className="border-b border-gray-100 mx-4"></div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="text-xs text-gray-500 mt-4 px-1 text-center">
+          Selected fields will be securely shared. You can revoke access anytime.
+        </p>
+      </div>
+
+      {/* Bottom Action */}
+      <div className="bg-white border-t border-gray-200 px-4 py-4 mt-auto">
+        <button 
+          disabled={hasMissingRequired}
+          className={`w-full font-semibold py-4 rounded-xl shadow-sm transition-colors ${
+            hasMissingRequired 
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-violet-600 text-white hover:bg-violet-700'
+          }`}
+        >
+          {hasMissingRequired ? 'Cannot Share - Missing Required Fields' : `Share ${selectedCount} ${selectedCount === 1 ? 'Field' : 'Fields'}`}
+        </button>
+        <p className="text-xs text-gray-500 text-center mt-3">
+          {hasMissingRequired 
+            ? 'Add the required credentials to continue'
+            : 'This request will be logged in your sharing history'
+          }
+        </p>
+      </div>
+    </div>
+  );
+}
