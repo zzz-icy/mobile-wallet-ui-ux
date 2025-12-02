@@ -20,12 +20,12 @@ export default function App() {
             const nextIndex = (currentIndex + 1) % views.length;
             setCurrentView(views[nextIndex]);
           }}
-          className="bg-violet-600 text-white px-4 py-2.5 rounded-full shadow-lg hover:bg-violet-700 transition-colors flex items-center gap-2 text-sm font-medium"
+          className="bg-white/90 backdrop-blur-sm text-gray-600 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-white transition-all flex items-center gap-1.5 text-xs sm:text-sm font-normal shadow-sm"
           title="Switch view"
           aria-label="Switch view"
         >
-          <ArrowLeftRight className="w-4 h-4" />
-          <span>
+          <ArrowLeftRight className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">
             {currentView === 'onboarding' && 'New Onboarding'}
             {currentView === 'onboarding-original' && 'Original Onboarding'}
             {currentView === 'disclosure' && 'Disclosure'}
