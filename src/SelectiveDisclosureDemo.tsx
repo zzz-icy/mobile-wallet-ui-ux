@@ -90,7 +90,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: false,
-          description: 'Optional for their records'
+          description: ''
         },
         { 
           id: 'dateOfBirth', 
@@ -99,7 +99,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: false,
-          description: 'Alternative - they can calculate from this'
+          description: ''
         }
       ]
     },
@@ -118,7 +118,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
           ],
           required: true,
-          description: 'Required for package recipient'
+          description: ''
         },
         { 
           id: 'fullAddress', 
@@ -128,7 +128,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'utility', name: "Utility Bill", value: '123 Main St, Austin, TX 78701' }
           ],
           required: true,
-          description: 'Required for delivery location'
+          description: ''
         },
         { 
           id: 'phoneNumber', 
@@ -137,7 +137,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'contact', name: "Contact Info", value: '(512) 555-0123' }
           ],
           required: false,
-          description: 'Optional for delivery notifications'
+          description: ''
         }
       ]
     },
@@ -157,7 +157,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'Sami Kandur', expired: false }
           ],
           required: true,
-          description: 'Required for boarding pass match'
+          description: ''
         },
         { 
           id: 'photo', 
@@ -167,7 +167,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'Photo available', expired: false }
           ],
           required: true,
-          description: 'Current photo ID required'
+          description: ''
         },
         { 
           id: 'dateOfBirth', 
@@ -177,7 +177,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'March 15, 1996', expired: false }
           ],
           required: true,
-          description: 'Required for identity verification'
+          description: ''
         }
       ]
     },
@@ -227,14 +227,14 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: true,
-          description: 'Required for badge printing'
+          description: ''
         },
         { 
           id: 'professionalLicense', 
           label: 'Professional License Number', 
           sources: [],
           required: true,
-          description: 'Required to verify professional status',
+          description: '',
           missing: true
         },
         { 
@@ -244,7 +244,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'linkedin', name: 'LinkedIn', value: 'Acme Corp' }
           ],
           required: false,
-          description: 'Optional for networking'
+          description: ''
         }
       ]
     },
@@ -263,7 +263,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'manual', name: 'Manually Combined', value: 'Sami Kandur', partial: true, partialNote: 'Combined from First Name + Last Name fields' }
           ],
           required: true,
-          description: 'Required for account registration',
+          description: '',
           isPartialMatch: true
         },
         { 
@@ -273,7 +273,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }
           ],
           required: true,
-          description: 'Required for account access'
+          description: ''
         },
         { 
           id: 'phoneNumber', 
@@ -282,7 +282,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'contact', name: 'Contact Info', value: '(512) 555-0123' }
           ],
           required: false,
-          description: 'Optional for order updates'
+          description: ''
         }
       ]
     },
@@ -301,7 +301,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'March 15, 1996', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
           ],
           required: true,
-          description: 'Required for genealogy records',
+          description: '',
           unchangingData: true
         },
         { 
@@ -311,7 +311,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'Austin, Texas, USA', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
           ],
           required: true,
-          description: 'Required for family tree verification',
+          description: '',
           unchangingData: true
         },
         { 
@@ -321,7 +321,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
           ],
           required: true,
-          description: 'Required for account identification'
+          description: ''
         }
       ]
     },
@@ -350,7 +350,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: '28 years' }
           ],
           required: false,
-          description: 'Not required for entry',
+          description: '',
           overSharing: true
         },
         { 
@@ -360,7 +360,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: false,
-          description: 'Not required for entry',
+          description: '',
           overSharing: true
         },
         { 
@@ -370,7 +370,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: false,
-          description: 'Optional for guest list',
+          description: '',
           overSharing: false
         }
       ]
@@ -390,7 +390,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'DL-12345678', expiringSoon: true, expiryDate: 'Expires: Dec 10, 2025' }
           ],
           required: true,
-          description: 'Required for vehicle rental'
+          description: ''
         },
         { 
           id: 'fullName', 
@@ -399,7 +399,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
           ],
           required: true,
-          description: 'Required for rental agreement'
+          description: ''
         },
         { 
           id: 'dateOfBirth', 
@@ -408,7 +408,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: 'March 15, 1996' }
           ],
           required: true,
-          description: 'Required for age verification (25+)'
+          description: ''
         }
       ]
     },
@@ -427,7 +427,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'derived', name: 'Calculated from DOB', value: 'Not eligible (Age: 28)', derived: true, calculatedFrom: 'Date of Birth' }
           ],
           required: true,
-          description: 'Verify eligibility for senior discount',
+          description: '',
           privacyPreserving: true
         },
         { 
@@ -437,7 +437,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: false,
-          description: 'They can calculate from this',
+          description: '',
           lessPrivate: true
         }
       ]
@@ -458,7 +458,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'marriage', name: 'Marriage Certificate', value: 'Sami Johnson' }
           ],
           required: true,
-          description: 'Must match government ID',
+          description: '',
           hasMultipleIdentities: true
         },
         { 
@@ -468,7 +468,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: true,
-          description: 'Required for identity verification'
+          description: ''
         },
         { 
           id: 'address', 
@@ -477,7 +477,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' }
           ],
           required: true,
-          description: 'Required for correspondence'
+          description: ''
         }
       ]
     },
@@ -523,7 +523,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: true,
-          description: 'Required for rewards account',
+          description: '',
           previouslyShared: true
         },
         { 
@@ -533,7 +533,7 @@ export default function SelectiveDisclosureDemo() {
             { id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }
           ],
           required: true,
-          description: 'Required for digital receipts',
+          description: '',
           previouslyShared: false,
           newRequest: true
         },
@@ -876,7 +876,9 @@ export default function SelectiveDisclosureDemo() {
                         )}
                       </div>
                       <p className="text-sm text-gray-900 mt-0.5">{selectedSource?.value}</p>
-                      <p className="text-xs text-gray-500 mt-1">{field.description}</p>
+                      {field.description && (
+                        <p className="text-xs text-gray-500 mt-1">{field.description}</p>
+                      )}
                       
                       {/* Special warnings/notes */}
                       {field.isPartialMatch && (
