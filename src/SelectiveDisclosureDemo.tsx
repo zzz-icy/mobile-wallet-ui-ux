@@ -8,14 +8,8 @@ type Source = {
   derived?: boolean;
   expired?: boolean;
   oldData?: boolean;
-  expiringSoon?: boolean;
-  partial?: boolean;
   issueDate?: string;
-  expiredDate?: string;
-  expiryDate?: string;
-  partialNote?: string;
   calculatedFrom?: string;
-  validDespiteExpiry?: boolean;
   recommended?: boolean;
 };
 
@@ -28,11 +22,9 @@ type Field = {
   privacyPreserving?: boolean;
   missing?: boolean;
   sensitive?: boolean;
-  overSharing?: boolean;
   newRequest?: boolean;
   previouslyShared?: boolean;
   hasConflict?: boolean;
-  isPartialMatch?: boolean;
   unchangingData?: boolean;
   hasMultipleIdentities?: boolean;
   lessPrivate?: boolean;
@@ -54,7 +46,7 @@ type Scenario = {
   };
 };
 
-type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'conflicting-data' | 'missing-required' | 'partial-data' | 'expired-still-valid' | 'oversharing-warning' | 'expiring-soon' | 'derived-calculated' | 'multiple-identities' | 'excessive-fields' | 'previous-sharing';
+type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'conflicting-data' | 'missing-required' | 'excessive-fields' | 'previous-sharing';
 
 export default function SelectiveDisclosureDemo() {
   const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('age-verification');
@@ -76,27 +68,30 @@ export default function SelectiveDisclosureDemo() {
           id: 'ageVerification', 
           label: 'Age Verification (Over 21)', 
           sources: [
-            { id: 'derived-passport', name: 'Derived from Passport DOB', value: 'Verified: Over 21 ✓', derived: true },
-            { id: 'derived-drivers', name: "Derived from Driver's License DOB", value: 'Verified: Over 21 ✓', derived: true }
+            { id: 'derived-passport', name: 'Calculated from Passport DOB', value: 'Verified: Over 21 ✓', derived: true, calculatedFrom: 'Date of Birth' },
+            { id: 'derived-drivers', name: "Calculated from Driver's License DOB", value: 'Verified: Over 21 ✓', derived: true, calculatedFrom: 'Date of Birth' }
           ],
           required: true,
           description: 'Prove you meet minimum age',
-          privacyPreserving: true
+          privacyPreserving: true,
+          derived: true
         },
         { 
-          id: 'fullName', 
+          id: 'alternativeProof',
+          label: 'Alternative: Share Date of Birth', 
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' },
+            { id: 'drivers', name: "Driver's License", value: 'March 15, 1996' }
+          ],
+          required: false,
+          description: '',
+          lessPrivate: true
+        },
+        { 
+          id: 'fullName',
           label: 'Full Name', 
           sources: [
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
-          ],
-          required: false,
-          description: ''
-        },
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: false,
           description: ''
@@ -190,6 +185,17 @@ export default function SelectiveDisclosureDemo() {
       },
       fields: [
         { 
+          id: 'legalName',
+          label: 'Legal Name',
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami Kandur' },
+            { id: 'marriage', name: 'Marriage Certificate', value: 'Sami Johnson' }
+          ],
+          required: true,
+          description: '',
+          hasMultipleIdentities: true
+        },
+        { 
           id: 'currentAddress', 
           label: 'Current Address', 
           sources: [
@@ -202,13 +208,13 @@ export default function SelectiveDisclosureDemo() {
           hasConflict: true
         },
         { 
-          id: 'fullName', 
-          label: 'Full Name', 
+          id: 'dateOfBirth',
+          label: 'Date of Birth', 
           sources: [
-            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: true,
-          description: 'Name on record'
+          description: ''
         }
       ]
     },
@@ -244,239 +250,6 @@ export default function SelectiveDisclosureDemo() {
             { id: 'linkedin', name: 'LinkedIn', value: 'Acme Corp' }
           ],
           required: false,
-          description: ''
-        }
-      ]
-    },
-    'partial-data': {
-      name: '⚠️ Edge: Partial Data Available',
-      verifier: {
-        name: "Online Retailer",
-        purpose: "Account Verification",
-        icon: "🛒"
-      },
-      fields: [
-        { 
-          id: 'fullName', 
-          label: 'Full Name', 
-          sources: [
-            { id: 'manual', name: 'Manually Combined', value: 'Sami Kandur', partial: true, partialNote: 'Combined from First Name + Last Name fields' }
-          ],
-          required: true,
-          description: '',
-          isPartialMatch: true
-        },
-        { 
-          id: 'email', 
-          label: 'Email Address', 
-          sources: [
-            { id: 'contact', name: 'Contact Info', value: 'sami.kandur@email.com' }
-          ],
-          required: true,
-          description: ''
-        },
-        { 
-          id: 'phoneNumber', 
-          label: 'Phone Number', 
-          sources: [
-            { id: 'contact', name: 'Contact Info', value: '(512) 555-0123' }
-          ],
-          required: false,
-          description: ''
-        }
-      ]
-    },
-    'expired-still-valid': {
-      name: '⚠️ Edge: Expired but Data Valid',
-      verifier: {
-        name: "Ancestry Research Service",
-        purpose: "Identity Verification",
-        icon: "🌳"
-      },
-      fields: [
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
-          ],
-          required: true,
-          description: '',
-          unchangingData: true
-        },
-        { 
-          id: 'birthplace', 
-          label: 'Place of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'Austin, Texas, USA', expired: true, expiredDate: 'Expired: June 2024', validDespiteExpiry: true }
-          ],
-          required: true,
-          description: '',
-          unchangingData: true
-        },
-        { 
-          id: 'fullName', 
-          label: 'Full Name', 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
-          ],
-          required: true,
-          description: ''
-        }
-      ]
-    },
-    'oversharing-warning': {
-      name: '⚠️ Edge: Over-sharing Risk',
-      verifier: {
-        name: "Nightclub 21+",
-        purpose: "Age Verification Only",
-        icon: "🎵"
-      },
-      fields: [
-        { 
-          id: 'ageVerification', 
-          label: 'Age Verification (Over 21)', 
-          sources: [
-            { id: 'derived', name: 'Derived from DOB', value: 'Verified: Over 21 ✓', derived: true, recommended: true }
-          ],
-          required: true,
-          description: 'Prove you meet minimum age',
-          privacyPreserving: true
-        },
-        { 
-          id: 'exactAge', 
-          label: 'Exact Age', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: '28 years' }
-          ],
-          required: false,
-          description: '',
-          overSharing: true
-        },
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
-          ],
-          required: false,
-          description: '',
-          overSharing: true
-        },
-        { 
-          id: 'fullName', 
-          label: 'Full Name', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
-          ],
-          required: false,
-          description: '',
-          overSharing: false
-        }
-      ]
-    },
-    'expiring-soon': {
-      name: '⚠️ Edge: Credential Expiring Soon',
-      verifier: {
-        name: "Car Rental Agency",
-        purpose: "Driver License Verification",
-        icon: "🚙"
-      },
-      fields: [
-        { 
-          id: 'driversLicense', 
-          label: "Driver's License Number", 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: 'DL-12345678', expiringSoon: true, expiryDate: 'Expires: Dec 10, 2025' }
-          ],
-          required: true,
-          description: ''
-        },
-        { 
-          id: 'fullName', 
-          label: 'Full Name', 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: 'Sami Kandur' }
-          ],
-          required: true,
-          description: ''
-        },
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: 'March 15, 1996' }
-          ],
-          required: true,
-          description: ''
-        }
-      ]
-    },
-    'derived-calculated': {
-      name: '⚠️ Edge: Derived/Calculated Field',
-      verifier: {
-        name: "Movie Theater",
-        purpose: "Senior Discount Eligibility",
-        icon: "🎬"
-      },
-      fields: [
-        { 
-          id: 'seniorStatus', 
-          label: 'Senior Status (65+)', 
-          sources: [
-            { id: 'derived', name: 'Calculated from DOB', value: 'Not eligible (Age: 28)', derived: true, calculatedFrom: 'Date of Birth' }
-          ],
-          required: true,
-          description: '',
-          privacyPreserving: true
-        },
-        { 
-          id: 'alternativeProof', 
-          label: 'Alternative: Share Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
-          ],
-          required: false,
-          description: '',
-          lessPrivate: true
-        }
-      ]
-    },
-    'multiple-identities': {
-      name: '⚠️ Edge: Multiple Identities',
-      verifier: {
-        name: "Banking Institution",
-        purpose: "Account Opening",
-        icon: "🏦"
-      },
-      fields: [
-        { 
-          id: 'legalName', 
-          label: 'Legal Name', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'Sami Kandur' },
-            { id: 'marriage', name: 'Marriage Certificate', value: 'Sami Johnson' }
-          ],
-          required: true,
-          description: '',
-          hasMultipleIdentities: true
-        },
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
-          ],
-          required: true,
-          description: ''
-        },
-        { 
-          id: 'address', 
-          label: 'Current Address', 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' }
-          ],
-          required: true,
           description: ''
         }
       ]
@@ -859,11 +632,6 @@ export default function SelectiveDisclosureDemo() {
                             Privacy-Preserving
                           </span>
                         )}
-                        {field.overSharing && (
-                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">
-                            ⚠️ Shares More
-                          </span>
-                        )}
                         {field.newRequest && (
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-medium">
                             🆕 New Field
@@ -881,27 +649,13 @@ export default function SelectiveDisclosureDemo() {
                       )}
                       
                       {/* Special warnings/notes */}
-                      {field.isPartialMatch && (
-                        <div className="mt-2 flex items-center gap-1 text-blue-600">
-                          <Info className="w-3 h-3" />
-                          <span className="text-xs font-medium">Automatically combined from separate fields</span>
-                        </div>
-                      )}
-                      
                       {field.unchangingData && selectedSource?.expired && (
                         <div className="mt-2 flex items-center gap-1 text-amber-600">
                           <Info className="w-3 h-3" />
                           <span className="text-xs font-medium">Credential expired, but this data doesn't change</span>
                         </div>
                       )}
-                      
-                      {field.overSharing && !field.required && (
-                        <div className="mt-2 flex items-center gap-1 text-amber-600">
-                          <AlertCircle className="w-3 h-3" />
-                          <span className="text-xs font-medium">Not required - sharing this reduces your privacy</span>
-                        </div>
-                      )}
-                      
+
                       {field.hasMultipleIdentities && (
                         <div className="mt-2 flex items-center gap-1 text-blue-600">
                           <AlertCircle className="w-3 h-3" />
@@ -986,17 +740,6 @@ export default function SelectiveDisclosureDemo() {
                                       Expired (Data Valid)
                                     </span>
                                   )}
-                                  {source.expiringSoon && (
-                                    <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
-                                      <Clock className="w-3 h-3" />
-                                      Expires Soon
-                                    </span>
-                                  )}
-                                  {source.partial && (
-                                    <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">
-                                      Combined
-                                    </span>
-                                  )}
                                   {source.derived && (
                                     <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
                                       Privacy+
@@ -1006,15 +749,6 @@ export default function SelectiveDisclosureDemo() {
                                 <span className="text-xs text-gray-600">{source.value}</span>
                                 {source.issueDate && (
                                   <span className="text-xs text-gray-500">{source.issueDate}</span>
-                                )}
-                                {source.expiredDate && (
-                                  <span className="text-xs text-gray-500">{source.expiredDate}</span>
-                                )}
-                                {source.expiryDate && (
-                                  <span className="text-xs text-amber-600 font-medium">{source.expiryDate}</span>
-                                )}
-                                {source.partialNote && (
-                                  <span className="text-xs text-blue-600">{source.partialNote}</span>
                                 )}
                                 {source.calculatedFrom && (
                                   <span className="text-xs text-green-600">Calculated from {source.calculatedFrom}</span>
