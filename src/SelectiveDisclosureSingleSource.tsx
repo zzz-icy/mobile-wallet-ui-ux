@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ChevronDown, Shield, Info, AlertCircle, Clock, Plus, X } from 'lucide-react';
+import { Check, ChevronDown, Shield, Info, AlertCircle, Clock, Plus, X, CreditCard, FileText, Car } from 'lucide-react';
 
 type Source = {
   id: string;
@@ -24,7 +24,6 @@ type Field = {
   sensitive?: boolean;
   newRequest?: boolean;
   previouslyShared?: boolean;
-  hasConflict?: boolean;
   unchangingData?: boolean;
   hasMultipleIdentities?: boolean;
   lessPrivate?: boolean;
@@ -46,7 +45,7 @@ type Scenario = {
   };
 };
 
-type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'conflicting-data' | 'missing-required' | 'excessive-fields' | 'previous-sharing';
+type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'missing-required' | 'excessive-fields' | 'previous-sharing';
 
 export default function SelectiveDisclosureSingleSource() {
   const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('age-verification');
@@ -173,48 +172,6 @@ export default function SelectiveDisclosureSingleSource() {
           sources: [
             { id: 'passport', name: "Passport", value: 'March 15, 1996', expired: true },
             { id: 'drivers', name: "Driver's License", value: 'March 15, 1996', expired: false }
-          ],
-          required: true,
-          description: ''
-        }
-      ]
-    },
-    'conflicting-data': {
-      name: '⚠️ Edge: Conflicting Data',
-      verifier: {
-        name: "State DMV",
-        purpose: "Address Update Verification",
-        icon: "🚗"
-      },
-      fields: [
-        { 
-          id: 'legalName', 
-          label: 'Legal Name', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'Sami Kandur' },
-            { id: 'marriage', name: 'Marriage Certificate', value: 'Sami Johnson' }
-          ],
-          required: true,
-          description: '',
-          hasMultipleIdentities: true
-        },
-        { 
-          id: 'currentAddress', 
-          label: 'Current Address', 
-          sources: [
-            { id: 'drivers', name: "Driver's License", value: '123 Old St, Austin, TX 78701', issueDate: 'Issued: Jan 2023' },
-            { id: 'utility', name: "Utility Bill", value: '456 New Ave, Austin, TX 78702', issueDate: 'Dated: Nov 2025' },
-            { id: 'lease', name: "Lease Agreement", value: '456 New Ave, Austin, TX 78702', issueDate: 'Signed: Oct 2025' }
-          ],
-          required: true,
-          description: 'Current residential address',
-          hasConflict: true
-        },
-        { 
-          id: 'dateOfBirth', 
-          label: 'Date of Birth', 
-          sources: [
-            { id: 'passport', name: 'Passport', value: 'March 15, 1996' }
           ],
           required: true,
           description: ''
@@ -395,6 +352,20 @@ export default function SelectiveDisclosureSingleSource() {
   const availableFields = selectedSource ? getFieldsForBaseSource(selectedSource) : [];
   const selectedBaseSource = baseSources.find(s => s.baseName === selectedSource);
 
+  // Get icon for source type
+  const getSourceIcon = (sourceName: string, isSelected: boolean) => {
+    const lowerName = sourceName.toLowerCase();
+    const iconColor = isSelected ? 'text-violet-600' : 'text-gray-400';
+
+    if (lowerName.includes('passport')) {
+      return <CreditCard className={`w-5 h-5 ${iconColor}`} />;
+    } else if (lowerName.includes('driver') || lowerName.includes('license')) {
+      return <Car className={`w-5 h-5 ${iconColor}`} />;
+    } else {
+      return <FileText className={`w-5 h-5 ${iconColor}`} />;
+    }
+  };
+
   const toggleField = (fieldId: string) => {
     const field = availableFields.find((f: Field) => f.id === fieldId);
     if (!field || field.required || field.missing) return;
@@ -405,21 +376,29 @@ export default function SelectiveDisclosureSingleSource() {
     }));
   };
 
+  const [pendingSource, setPendingSource] = useState<string | null>(null);
+
   const selectSource = (baseName: string) => {
-    setSelectedSource(baseName);
+    setPendingSource(baseName);
+  };
+
+  const confirmSourceSelection = () => {
+    if (!pendingSource) return;
+
+    setSelectedSource(pendingSource);
     setSelectedDataOptions({});
     setExpandedField(null);
     
     // Auto-select required fields and default data options
     const required: Record<string, boolean> = {};
     const defaultDataOptions: Record<string, string> = {};
-    const fieldsForSource = getFieldsForBaseSource(baseName);
+    const fieldsForSource = getFieldsForBaseSource(pendingSource);
     
     fieldsForSource.forEach((field: Field) => {
       if (field.required && !field.missing) {
         required[field.id] = true;
         // Default to derived/calculated if available, otherwise first option
-        const dataOptions = getDataOptionsForField(field, baseName);
+        const dataOptions = getDataOptionsForField(field, pendingSource);
         const derivedOption = dataOptions.find(s => s.derived);
         const defaultOption = derivedOption || dataOptions[0];
         if (defaultOption) {
@@ -430,6 +409,7 @@ export default function SelectiveDisclosureSingleSource() {
     
     setSelectedFields(required);
     setSelectedDataOptions(defaultDataOptions);
+    setPendingSource(null);
   };
 
   const selectDataOption = (fieldId: string, sourceId: string) => {
@@ -444,6 +424,7 @@ export default function SelectiveDisclosureSingleSource() {
     setCurrentScenario(scenarioKey);
     setSelectedFields({});
     setSelectedSource(null);
+    setPendingSource(null);
     setSelectedDataOptions({});
     setExpandedField(null);
     setShowScenarios(false);
@@ -625,7 +606,7 @@ export default function SelectiveDisclosureSingleSource() {
       )}
 
       {/* Missing Required Fields Warning */}
-      {hasMissingRequired && (
+      {hasMissingRequired && !currentData.excessiveRequest && (
         <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -647,48 +628,75 @@ export default function SelectiveDisclosureSingleSource() {
               <h4 className="text-sm font-semibold text-gray-900 mb-1">Choose a source</h4>
               <p className="text-xs text-gray-600">All fields will come from the source you select</p>
             </div>
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-              {baseSources.map((baseSource, index: number) => {
+            <div className="space-y-3">
+              {baseSources.map((baseSource) => {
                 const fieldsFromSource = getFieldsForBaseSource(baseSource.baseName);
-                const hasRequiredFields = fieldsFromSource.some((f: Field) => f.required && !f.missing);
+                const isSelected = pendingSource === baseSource.baseName;
+
+                // Check if source has expired credentials
+                const hasExpiredCredentials = baseSource.sources.some(s => s.expired);
+                const hasUnchangingData = fieldsFromSource.some(f => f.unchangingData);
                 
                 return (
-                  <div key={baseSource.baseName}>
-                    <button
-                      onClick={() => selectSource(baseSource.baseName)}
-                      className="w-full px-4 py-4 text-left hover:bg-violet-50 active:bg-violet-100 transition-colors"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                          selectedSource === baseSource.baseName 
-                            ? 'bg-violet-600 border-violet-600' 
-                            : 'border-gray-300 bg-white'
-                        }`}>
-                          {selectedSource === baseSource.baseName && (
-                            <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                  <button
+                    key={baseSource.baseName}
+                    onClick={() => selectSource(baseSource.baseName)}
+                    className={`w-full text-left rounded-xl p-4 transition-all ${isSelected
+                      ? 'bg-violet-50 border-2 border-violet-600 shadow-sm'
+                      : 'bg-white border-2 border-gray-200 hover:border-violet-300 hover:bg-violet-50/50'
+                      }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        {getSourceIcon(baseSource.displayName, isSelected)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-semibold text-sm ${isSelected ? 'text-violet-900' : 'text-gray-900'
+                            }`}>
+                            {baseSource.displayName}
+                          </span>
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-violet-600" strokeWidth={3} />
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-gray-900 text-sm">{baseSource.displayName}</span>
-                            {hasRequiredFields && (
-                              <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-md font-medium">
-                                Has Required
-                              </span>
-                            )}
+                        <p className={`text-xs mt-1 ${isSelected ? 'text-violet-700' : 'text-gray-500'
+                          }`}>
+                          {fieldsFromSource.length} {fieldsFromSource.length === 1 ? 'field' : 'fields'} available
+                        </p>
+                        {hasExpiredCredentials && (
+                          <div className="mt-2 flex items-center gap-1.5 text-red-600">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span className="text-xs">
+                              {hasUnchangingData
+                                ? 'Contains expired credentials (some data still valid)'
+                                : 'Contains expired credentials'
+                              }
+                            </span>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {fieldsFromSource.length} {fieldsFromSource.length === 1 ? 'field' : 'fields'} available
-                          </p>
-                        </div>
+                        )}
                       </div>
-                    </button>
-                    {index < baseSources.length - 1 && (
-                      <div className="border-b border-gray-100 mx-4"></div>
-                    )}
-                  </div>
+                    </div>
+                  </button>
                 );
               })}
+            </div>
+
+            {/* CTA Button for Source Selection */}
+            <div className="mt-6">
+              <button
+                onClick={confirmSourceSelection}
+                disabled={!pendingSource}
+                className={`w-full font-semibold py-4 rounded-xl shadow-sm transition-colors ${pendingSource
+                  ? 'bg-violet-600 text-white hover:bg-violet-700 cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+              >
+                {pendingSource
+                  ? `Continue with ${baseSources.find(s => s.baseName === pendingSource)?.displayName}`
+                  : 'Select a source to continue'
+                }
+              </button>
             </div>
           </>
         ) : (
@@ -697,6 +705,9 @@ export default function SelectiveDisclosureSingleSource() {
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Sharing from</span>
                 <span className="text-sm font-semibold text-violet-600">{selectedBaseSource?.displayName}</span>
+                  {selectedBaseSource?.sources.some(s => s.expired) && (
+                    <span className="text-xs text-red-600">(expired)</span>
+                  )}
               </div>
               <button
                 onClick={() => {
@@ -710,8 +721,8 @@ export default function SelectiveDisclosureSingleSource() {
               </button>
             </div>
             
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-              {availableFields.map((field: Field, index: number) => {
+              <div className="space-y-3">
+                {availableFields.map((field: Field) => {
                 const selectedSourceForField = getSelectedSourceForField(field);
                 const dataOptions = getDataOptionsForField(field, selectedSource!);
                 const hasMultipleOptions = dataOptions.length > 1;
@@ -721,118 +732,73 @@ export default function SelectiveDisclosureSingleSource() {
                 // Missing field rendering
                 if (field.missing) {
                   return (
-                    <div key={field.id}>
-                      <div className="px-4 py-4 bg-red-50">
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-lg border-2 border-red-300 flex items-center justify-center flex-shrink-0 bg-white">
-                            <X className="w-4 h-4 text-red-500" strokeWidth={2.5} />
-                          </div>
+                    <div key={field.id} className="rounded-xl p-4 bg-red-50 border-2 border-red-200">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-lg border-2 border-red-300 flex items-center justify-center flex-shrink-0 bg-white mt-0.5">
+                          <X className="w-4 h-4 text-red-500" strokeWidth={2.5} />
+                        </div>
 
-                          <div className="flex-1 text-left min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-900 text-sm">{field.label}</span>
-                              <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-medium">
-                                Required
-                              </span>
-                              {field.sensitive && (
-                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md font-medium">
-                                  Sensitive
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-red-700 font-medium mt-0.5">Not in your wallet</p>
-                            <p className="text-xs text-red-600 mt-1">{field.description}</p>
-                            
-                            <button className="mt-3 flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-700">
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Add this credential</span>
-                            </button>
+                        <div className="flex-1 text-left min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900 text-sm">{field.label}</span>
+                            <span className="text-xs text-gray-500">Required</span>
                           </div>
+                          <p className="text-sm text-red-700 font-medium mt-1">Not in your wallet</p>
+                          {field.description && (
+                            <p className="text-xs text-red-600 mt-1">{field.description}</p>
+                          )}
+
+                          <button className="mt-3 flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-700">
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add this credential</span>
+                          </button>
                         </div>
                       </div>
-                      {index < availableFields.length - 1 && (
-                        <div className="border-b border-gray-100 mx-4"></div>
-                      )}
                     </div>
                   );
                 }
                 
                 return (
                   <div key={field.id}>
-                    <div className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        {/* Checkbox */}
-                        <button
-                          onClick={() => toggleField(field.id)}
-                          disabled={field.required}
-                          className="flex-shrink-0"
-                        >
-                          <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                            isSelected 
-                              ? 'bg-violet-600 border-violet-600' 
-                              : 'border-gray-300'
-                          } ${field.required ? 'opacity-50' : ''}`}>
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-white" strokeWidth={3} />
-                            )}
-                          </div>
-                        </button>
-
+                    <button
+                      onClick={() => toggleField(field.id)}
+                      disabled={field.required}
+                      className={`w-full text-left rounded-xl p-4 transition-all mb-3 ${isSelected
+                        ? 'bg-violet-50 border-2 border-violet-600 shadow-sm'
+                        : 'bg-white border-2 border-gray-200 hover:border-violet-300 hover:bg-violet-50/50'
+                        } ${field.required ? 'opacity-75 cursor-default' : 'cursor-pointer'}`}
+                    >
+                      <div className="flex items-start gap-3">
                         {/* Field Info */}
                         <div className="flex-1 text-left min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-gray-900 text-sm">{field.label}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-semibold text-sm ${isSelected ? 'text-violet-900' : 'text-gray-900'
+                              }`}>{field.label}</span>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-violet-600" strokeWidth={3} />
+                            )}
                             {field.required && (
-                              <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-md font-medium">
-                                Required
-                              </span>
-                            )}
-                            {field.sensitive && (
-                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md font-medium">
-                                Sensitive
-                              </span>
-                            )}
-                            {field.derived && (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-md font-medium">
-                                Privacy-Preserving
-                              </span>
-                            )}
-                            {field.newRequest && (
-                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-medium">
-                                🆕 New Field
-                              </span>
-                            )}
-                            {field.previouslyShared && (
-                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
-                                Previously Shared
-                              </span>
+                              <span className="text-xs text-gray-500">Required</span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-900 mt-0.5">{selectedSourceForField?.value}</p>
-                          {field.description && (
-                            <p className="text-xs text-gray-500 mt-1">{field.description}</p>
+                          <p className={`text-sm mt-1 font-medium ${isSelected ? 'text-violet-700' : 'text-gray-700'
+                            }`}>{selectedSourceForField?.value}</p>
+                          {field.derived && !hasMultipleOptions && (
+                            <span className="text-xs text-green-600 mt-1 inline-block">Privacy-preserving</span>
                           )}
                           
                           {/* Data Option Selector - Show when multiple options available */}
                           {hasMultipleOptions && (
-                            <div className="mt-3">
+                            <div className="mt-2">
                               <button
                                 onClick={() => setExpandedField(isExpanded ? null : field.id)}
-                                className="w-full bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 flex items-center justify-between hover:bg-amber-100 transition-colors"
+                                className="w-full text-left text-xs text-violet-600 hover:text-violet-700 flex items-center gap-1"
                               >
-                                <div className="flex items-center gap-2">
-                                  <AlertCircle className="w-4 h-4 text-amber-600" />
-                                  <span className="text-xs font-medium text-amber-900">Choose data:</span>
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {selectedSourceForField?.derived ? 'Calculated' : 'Original'}
-                                  </span>
-                                  {selectedSourceForField?.derived && (
-                                    <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
-                                      Privacy+
-                                    </span>
-                                  )}
-                                </div>
-                                <ChevronDown className={`w-4 h-4 text-amber-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                <span>{selectedSourceForField?.derived ? 'Calculated' : 'Original'} data</span>
+                                {selectedSourceForField?.derived && (
+                                  <span className="text-green-600">• Privacy-preserving</span>
+                                )}
+                                <ChevronDown className={`w-3 h-3 ml-auto transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                               </button>
 
                               {/* Data Options */}
@@ -863,9 +829,15 @@ export default function SelectiveDisclosureSingleSource() {
                                             </span>
                                           )}
                                           {source.expired && !field.unchangingData && (
-                                            <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                                            <span className="text-xs text-red-600 flex items-center gap-1">
                                               <Clock className="w-3 h-3" />
                                               Expired
+                                            </span>
+                                          )}
+                                          {source.expired && field.unchangingData && (
+                                            <span className="text-xs text-amber-600 flex items-center gap-1">
+                                              <Info className="w-3 h-3" />
+                                              Expired (Valid)
                                             </span>
                                           )}
                                         </div>
@@ -884,43 +856,16 @@ export default function SelectiveDisclosureSingleSource() {
                             </div>
                           )}
                           
-                          {/* Special warnings/notes */}
-                          {field.unchangingData && selectedSourceForField?.expired && (
-                            <div className="mt-2 flex items-center gap-1 text-amber-600">
-                              <Info className="w-3 h-3" />
-                              <span className="text-xs font-medium">Credential expired, but this data doesn't change</span>
-                            </div>
-                          )}
-                          
+                          {/* Special warnings/notes - shown in consistent style */}
                           {field.hasMultipleIdentities && (
-                            <div className="mt-2 flex items-center gap-1 text-blue-600">
-                              <AlertCircle className="w-3 h-3" />
-                              <span className="text-xs font-medium">Choose which legal name to share</span>
-                            </div>
-                          )}
-                          
-                          {/* Warning for expired credential */}
-                          {selectedSourceForField?.expired && !field.unchangingData && (
-                            <div className="mt-2 flex items-center gap-1 text-red-600">
-                              <Clock className="w-3 h-3" />
-                              <span className="text-xs font-medium">Credential is expired</span>
-                            </div>
-                          )}
-                          
-                          {/* Warning for conflicting data */}
-                          {field.hasConflict && (
-                            <div className="mt-2 flex items-center gap-1 text-amber-600">
-                              <AlertCircle className="w-3 h-3" />
-                              <span className="text-xs font-medium">Different addresses found - select the correct one</span>
+                            <div className="mt-2 flex items-center gap-1.5 text-amber-600">
+                              <AlertCircle className="w-3.5 h-3.5" />
+                              <span className="text-xs">Multiple identities available in this source</span>
                             </div>
                           )}
                         </div>
                       </div>
-                    </div>
-                    
-                    {index < availableFields.length - 1 && (
-                      <div className="border-b border-gray-100 mx-4"></div>
-                    )}
+                    </button>
                   </div>
                 );
               })}
