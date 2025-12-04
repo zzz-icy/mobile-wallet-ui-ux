@@ -348,6 +348,16 @@ export default function SelectiveDisclosureSingleSource() {
     return field.sources.find((s: Source) => s.id === selectedSourceId);
   };
 
+  // Get the display value for a field (selected source or first available)
+  const getDisplayValueForField = (field: Field, baseName: string): string => {
+    const selectedSource = getSelectedSourceForField(field);
+    if (selectedSource) return selectedSource.value;
+
+    // If no option selected, show first available option's value
+    const dataOptions = getDataOptionsForField(field, baseName);
+    return dataOptions[0]?.value || '';
+  };
+
   const baseSources = getBaseSources();
   const availableFields = selectedSource ? getFieldsForBaseSource(selectedSource) : [];
   const selectedBaseSource = baseSources.find(s => s.baseName === selectedSource);
@@ -368,12 +378,28 @@ export default function SelectiveDisclosureSingleSource() {
 
   const toggleField = (fieldId: string) => {
     const field = availableFields.find((f: Field) => f.id === fieldId);
-    if (!field || field.required || field.missing) return;
+    if (!field || field.required || field.missing || !selectedSource) return;
+
+    const willBeSelected = !selectedFields[fieldId];
     
     setSelectedFields(prev => ({
       ...prev,
-      [fieldId]: !prev[fieldId]
+      [fieldId]: willBeSelected
     }));
+
+    // Auto-select first data option if field is being selected and no option is currently selected
+    if (willBeSelected && !selectedDataOptions[fieldId]) {
+      const dataOptions = getDataOptionsForField(field, selectedSource);
+      if (dataOptions.length > 0) {
+        // Prefer derived option if available, otherwise first option
+        const derivedOption = dataOptions.find(s => s.derived);
+        const defaultOption = derivedOption || dataOptions[0];
+        setSelectedDataOptions(prev => ({
+          ...prev,
+          [fieldId]: defaultOption.id
+        }));
+      }
+    }
   };
 
   const [pendingSource, setPendingSource] = useState<string | null>(null);
@@ -728,6 +754,7 @@ export default function SelectiveDisclosureSingleSource() {
                 const hasMultipleOptions = dataOptions.length > 1;
                 const isExpanded = expandedField === field.id;
                 const isSelected = selectedFields[field.id];
+                  const displayValue = getDisplayValueForField(field, selectedSource!);
                 
                 // Missing field rendering
                 if (field.missing) {
@@ -782,7 +809,7 @@ export default function SelectiveDisclosureSingleSource() {
                             )}
                           </div>
                           <p className={`text-sm mt-1 font-medium ${isSelected ? 'text-violet-700' : 'text-gray-700'
-                            }`}>{selectedSourceForField?.value}</p>
+                            }`}>{displayValue}</p>
                           {field.derived && !hasMultipleOptions && (
                             <span className="text-xs text-green-600 mt-1 inline-block">Privacy-preserving</span>
                           )}
