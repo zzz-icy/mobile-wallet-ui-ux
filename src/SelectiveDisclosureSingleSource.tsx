@@ -68,8 +68,8 @@ export default function SelectiveDisclosureSingleSource() {
           id: 'ageVerification', 
           label: 'Age Verification (Over 21)', 
           sources: [
-            { id: 'derived-passport', name: 'Passport', value: 'Verified: Over 21 ✓', derived: true, calculatedFrom: 'Date of Birth' },
-            { id: 'derived-drivers', name: "Driver's License", value: 'Verified: Over 21 ✓', derived: true, calculatedFrom: 'Date of Birth' }
+            { id: 'derived-passport', name: 'Passport', value: 'Verified: Over 21', derived: true, calculatedFrom: 'Date of Birth' },
+            { id: 'derived-drivers', name: "Driver's License", value: 'Verified: Over 21', derived: true, calculatedFrom: 'Date of Birth' }
           ],
           required: true,
           description: 'Prove you meet minimum age',
