@@ -1,4 +1,4 @@
-import { ArrowRight, Lock, Upload, QrCode, Eye } from 'lucide-react';
+import { Lock, Plus, QrCode, Eye } from 'lucide-react';
 import appIcon from './appicon-512.png';
 
 export default function OnboardingWelcomeOriginal() {
@@ -60,19 +60,19 @@ export default function OnboardingWelcomeOriginal() {
               {/* Steps Flow */}
               <div className="space-y-0">
                   {/* Step 1 */}
-                  <div className="relative flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
-                              <Upload className="w-6 h-6 text-white" />
+                              <Plus className="w-6 h-6 text-white" strokeWidth={2} />
                           </div>
                       </div>
-                          <div className="flex-1 pt-0.5">
-                              <h3 className="font-bold text-gray-900 text-sm">Add Your ID</h3>
-                              <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
-                                  Scan your government-issued ID e.g. passport or driver's license
-                </p>
-              </div>
-            </div>
+                      <div className="flex-1 pt-0.5">
+                          <h3 className="font-bold text-gray-900 text-sm">Add Your ID</h3>
+                          <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
+                              Scan your government-issued ID, such as a passport or driver's license
+                          </p>
+                      </div>
+                  </div>
 
                   {/* Flow Arrow */}
                   <div className="flex justify-center py-1">
@@ -80,19 +80,19 @@ export default function OnboardingWelcomeOriginal() {
                   </div>
 
                   {/* Step 2 */}
-                  <div className="relative flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
-                              <QrCode className="w-6 h-6 text-white" />
+                              <QrCode className="w-6 h-6 text-white" strokeWidth={2} />
                           </div>
-              </div>
-                          <div className="flex-1 pt-0.5">
-                              <h3 className="font-bold text-gray-900 text-sm">Scan QR Codes</h3>
-                              <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
-                                  Scan codes when businesses need verification
-                </p>
-              </div>
-            </div>
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                          <h3 className="font-bold text-gray-900 text-sm">Scan QR Codes</h3>
+                          <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
+                              Scan QR codes when businesses request verification
+                          </p>
+                      </div>
+                  </div>
 
                   {/* Flow Arrow */}
                   <div className="flex justify-center py-1">
@@ -100,44 +100,58 @@ export default function OnboardingWelcomeOriginal() {
                   </div>
 
                   {/* Step 3 */}
-                  <div className="relative flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
-                              <Eye className="w-6 h-6 text-white" />
+                              <Eye className="w-6 h-6 text-white" strokeWidth={2} />
                           </div>
-              </div>
-                          <div className="flex-1 pt-0.5">
-                              <h3 className="font-bold text-gray-900 text-sm">Choose What to Share</h3>
-                              <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
-                                  You control what information to share
-                </p>
-              </div>
-            </div>
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                          <h3 className="font-bold text-gray-900 text-sm">Choose What to Share</h3>
+                          <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
+                              You control what information to share
+                          </p>
+                      </div>
+                  </div>
               </div>
 
         {/* Privacy Section */}
               <div className="mt-5">
-                  <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-4 border border-violet-100">
-                      <div className="flex items-start gap-3">
-                          <div className="w-9 h-9 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                              <Lock className="w-4 h-4 text-white" />
+                  {/* Separator */}
+                  <div className="flex items-center gap-3 mb-3">
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-gray-300"></div>
+                      <div className="h-px flex-1 bg-gradient-to-r from-gray-300 via-gray-200 to-transparent"></div>
+                  </div>
+
+                  {/* Privacy Card - Distinct Design */}
+                  <div className="bg-white rounded-xl p-4 border-2 border-violet-200 shadow-sm">
+                      <div className="flex flex-col items-center text-center">
+                          <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200 mb-2">
+                              <Lock className="w-5 h-5 text-white" strokeWidth={1.5} />
                           </div>
-                          <div className="flex-1">
-                              <h3 className="font-bold text-gray-900 text-sm">Your data stays private</h3>
-                              <p className="text-xs text-gray-700 leading-relaxed mt-0.5">
-                                  Stored securely on your device. We never see your information.
-                              </p>
-                          </div>
-            </div>
-          </div>
+                          <h3 className="font-bold text-gray-900 text-sm mb-1">Your data stays private</h3>
+                          <p className="text-xs text-gray-600 leading-relaxed max-w-xs">
+                              Stored securely on your device. We never see your information.
+                          </p>
+                      </div>
+                  </div>
         </div>
       </div>
 
           {/* Bottom Action - Sticky Footer */}
           <div className="bg-white/80 backdrop-blur-sm border-t border-gray-100 px-6 py-4 safe-area-inset-bottom sticky bottom-0 z-20 shadow-lg shadow-black/5">
               <button className="w-full bg-gradient-to-r from-violet-600 to-violet-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-violet-200/50 hover:shadow-xl hover:shadow-violet-200/60 hover:from-violet-700 hover:to-violet-800 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]">
+                  <Plus className="w-4 h-4" strokeWidth={1.5} />
                   <span className="text-sm">Add Your First ID</span>
-                  <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                  onClick={() => {
+                      // Handle "Do it later" action
+                      console.log('Do it later clicked');
+                  }}
+                  className="w-full bg-white border border-violet-300 text-violet-700 font-semibold text-sm py-3 rounded-xl mt-3 hover:bg-violet-50 hover:border-violet-400 active:bg-violet-100 active:scale-[0.98] transition-all duration-200 shadow-sm"
+              >
+                  Do It Later
               </button>
       </div>
     </div>

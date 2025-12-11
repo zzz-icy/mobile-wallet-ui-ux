@@ -40,7 +40,7 @@ export default function App() {
   return (
     <>
       {/* View Switcher - Positioned to not block mobile UI */}
-      <div className="view-switcher-container fixed top-4 right-4 z-[100]">
+      {/* <div className="view-switcher-container fixed top-4 right-4 z-[100]">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           className="bg-white/90 backdrop-blur-sm text-gray-600 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-white transition-all flex items-center gap-1.5 text-xs sm:text-sm font-normal shadow-sm min-w-[120px] sm:min-w-[180px] justify-between"
@@ -76,7 +76,7 @@ export default function App() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* {currentView === 'onboarding' && <OnboardingWelcome />} */}
       {currentView === 'onboarding-original' && <OnboardingWelcomeOriginal />}

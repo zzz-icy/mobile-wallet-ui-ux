@@ -382,22 +382,41 @@ export default function SelectiveDisclosureSingleSource() {
 
     const willBeSelected = !selectedFields[fieldId];
     
-    setSelectedFields(prev => ({
-      ...prev,
-      [fieldId]: willBeSelected
-    }));
+    setSelectedFields(prev => {
+      const newState = { ...prev };
+      if (willBeSelected) {
+        newState[fieldId] = true;
+      } else {
+        // Remove field from selection when unselecting
+        delete newState[fieldId];
+      }
+      return newState;
+    });
 
-    // Auto-select first data option if field is being selected and no option is currently selected
-    if (willBeSelected && !selectedDataOptions[fieldId]) {
-      const dataOptions = getDataOptionsForField(field, selectedSource);
-      if (dataOptions.length > 0) {
-        // Prefer derived option if available, otherwise first option
-        const derivedOption = dataOptions.find(s => s.derived);
-        const defaultOption = derivedOption || dataOptions[0];
-        setSelectedDataOptions(prev => ({
-          ...prev,
-          [fieldId]: defaultOption.id
-        }));
+    if (willBeSelected) {
+      // Auto-select first data option if field is being selected and no option is currently selected
+      if (!selectedDataOptions[fieldId]) {
+        const dataOptions = getDataOptionsForField(field, selectedSource);
+        if (dataOptions.length > 0) {
+          // Prefer derived option if available, otherwise first option
+          const derivedOption = dataOptions.find(s => s.derived);
+          const defaultOption = derivedOption || dataOptions[0];
+          setSelectedDataOptions(prev => ({
+            ...prev,
+            [fieldId]: defaultOption.id
+          }));
+        }
+      }
+    } else {
+      // Clean up data option when unselecting field
+      setSelectedDataOptions(prev => {
+        const newState = { ...prev };
+        delete newState[fieldId];
+        return newState;
+      });
+      // Also close expanded field if it was this one
+      if (expandedField === fieldId) {
+        setExpandedField(null);
       }
     }
   };
@@ -412,29 +431,30 @@ export default function SelectiveDisclosureSingleSource() {
     if (!pendingSource) return;
 
     setSelectedSource(pendingSource);
-    setSelectedDataOptions({});
     setExpandedField(null);
-    
-    // Auto-select required fields and default data options
-    const required: Record<string, boolean> = {};
-    const defaultDataOptions: Record<string, string> = {};
+
     const fieldsForSource = getFieldsForBaseSource(pendingSource);
     
+    // Reset all selections - only keep required fields
+    const newSelectedFields: Record<string, boolean> = {};
+    const newSelectedDataOptions: Record<string, string> = {};
+
+    // Only auto-select required fields (preselected)
     fieldsForSource.forEach((field: Field) => {
       if (field.required && !field.missing) {
-        required[field.id] = true;
+        newSelectedFields[field.id] = true;
         // Default to derived/calculated if available, otherwise first option
         const dataOptions = getDataOptionsForField(field, pendingSource);
-        const derivedOption = dataOptions.find(s => s.derived);
+        const derivedOption = dataOptions.find((s: Source) => s.derived);
         const defaultOption = derivedOption || dataOptions[0];
         if (defaultOption) {
-          defaultDataOptions[field.id] = defaultOption.id;
+          newSelectedDataOptions[field.id] = defaultOption.id;
         }
       }
     });
-    
-    setSelectedFields(required);
-    setSelectedDataOptions(defaultDataOptions);
+
+    setSelectedFields(newSelectedFields);
+    setSelectedDataOptions(newSelectedDataOptions);
     setPendingSource(null);
   };
 
@@ -737,9 +757,10 @@ export default function SelectiveDisclosureSingleSource() {
               </div>
               <button
                 onClick={() => {
+                    // Preserve the current source as pending so it shows as selected when going back
+                    setPendingSource(selectedSource);
                   setSelectedSource(null);
-                  setSelectedFields({});
-                  setSelectedDataOptions({});
+                    // Don't reset selectedFields and selectedDataOptions - they will be preserved when confirming new source
                 }}
                 className="text-xs text-violet-600 font-medium hover:text-violet-700"
               >
@@ -753,7 +774,7 @@ export default function SelectiveDisclosureSingleSource() {
                 const dataOptions = getDataOptionsForField(field, selectedSource!);
                 const hasMultipleOptions = dataOptions.length > 1;
                 const isExpanded = expandedField === field.id;
-                const isSelected = selectedFields[field.id];
+                  const isSelected = !!selectedFields[field.id];
                   const displayValue = getDisplayValueForField(field, selectedSource!);
                 
                 // Missing field rendering
@@ -788,11 +809,15 @@ export default function SelectiveDisclosureSingleSource() {
                 return (
                   <div key={field.id}>
                     <button
-                      onClick={() => toggleField(field.id)}
+                      onClick={(e) => {
+                        toggleField(field.id);
+                        // Blur the button to remove focus state
+                        e.currentTarget.blur();
+                      }}
                       disabled={field.required}
-                      className={`w-full text-left rounded-xl p-4 transition-all mb-3 ${isSelected
+                      className={`w-full text-left rounded-xl p-4 transition-all mb-3 focus:outline-none ${isSelected
                         ? 'bg-violet-50 border-2 border-violet-600 shadow-sm'
-                        : 'bg-white border-2 border-gray-200 hover:border-violet-300 hover:bg-violet-50/50'
+                        : 'bg-white border-2 border-gray-200 focus:bg-white focus:border-gray-200 active:bg-white active:border-gray-200'
                         } ${field.required ? 'opacity-75 cursor-default' : 'cursor-pointer'}`}
                     >
                       <div className="flex items-start gap-3">
