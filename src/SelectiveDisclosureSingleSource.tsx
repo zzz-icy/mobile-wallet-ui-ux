@@ -45,7 +45,7 @@ type Scenario = {
   };
 };
 
-type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'missing-required' | 'excessive-fields' | 'previous-sharing';
+type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'missing-required' | 'excessive-fields' | 'previous-sharing' | 'separate-name-fields';
 
 export default function SelectiveDisclosureSingleSource() {
   const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('age-verification');
@@ -279,6 +279,56 @@ export default function SelectiveDisclosureSingleSource() {
           required: false,
           description: 'Optional for order notifications',
           previouslyShared: true
+        }
+      ]
+    },
+    'separate-name-fields': {
+      name: 'Separate Name Fields',
+      verifier: {
+        name: "Grand Hotel Downtown",
+        purpose: "Hotel Check-in Verification",
+        icon: "🏨"
+      },
+      fields: [
+        {
+          id: 'firstName',
+          label: 'First Name',
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Sami' },
+            { id: 'drivers', name: "Driver's License", value: 'Sami' }
+          ],
+          required: true,
+          description: ''
+        },
+        {
+          id: 'lastName',
+          label: 'Last Name',
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'Kandur' },
+            { id: 'drivers', name: "Driver's License", value: 'Kandur' }
+          ],
+          required: true,
+          description: ''
+        },
+        {
+          id: 'dateOfBirth',
+          label: 'Date of Birth',
+          sources: [
+            { id: 'passport', name: 'Passport', value: 'March 15, 1996' },
+            { id: 'drivers', name: "Driver's License", value: 'March 15, 1996' }
+          ],
+          required: false,
+          description: ''
+        },
+        {
+          id: 'address',
+          label: 'Address',
+          sources: [
+            { id: 'passport', name: 'Passport', value: '123 Main St, Austin, TX 78701' },
+            { id: 'drivers', name: "Driver's License", value: '123 Main St, Austin, TX 78701' }
+          ],
+          required: false,
+          description: ''
         }
       ]
     }
