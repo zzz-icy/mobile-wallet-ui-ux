@@ -3,18 +3,20 @@ import { ChevronDown, Check } from 'lucide-react';
 import OnboardingWelcomeOriginal from './OnboardingWelcomeOriginal';
 import SelectiveDisclosureDemo from './SelectiveDisclosureDemo';
 import SelectiveDisclosureSingleSource from './SelectiveDisclosureSingleSource';
+import CredentialSharingDetails from './CredentialSharingDetails';
 
-type ViewType = 'onboarding' | 'onboarding-original' | 'disclosure' | 'disclosure-single';
+type ViewType = 'onboarding' | 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing';
 
 const viewLabels: Record<ViewType, string> = {
   'onboarding': 'New Onboarding',
   'onboarding-original': 'Original Onboarding',
   'disclosure': 'Disclosure',
-  'disclosure-single': 'Disclosure (Single Source)'
+  'disclosure-single': 'Disclosure (Single Source)',
+  'credential-sharing': 'Credential Sharing Details'
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewType>('disclosure-single');
+  const [currentView, setCurrentView] = useState<ViewType>('credential-sharing');
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Close dropdown when clicking outside
@@ -76,12 +78,13 @@ export default function App() {
             ))}
           </div>
         )}
-      </div> */}
+      </div>  */}
 
       {/* {currentView === 'onboarding' && <OnboardingWelcome />} */}
       {currentView === 'onboarding-original' && <OnboardingWelcomeOriginal />}
       {currentView === 'disclosure' && <SelectiveDisclosureDemo />}
       {currentView === 'disclosure-single' && <SelectiveDisclosureSingleSource />}
+      {currentView === 'credential-sharing' && <CredentialSharingDetails />}
     </>
   );
 }

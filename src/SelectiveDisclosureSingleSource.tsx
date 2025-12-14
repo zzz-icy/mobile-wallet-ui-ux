@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ChevronDown, Shield, Info, AlertCircle, Clock, Plus, X, CreditCard, FileText, Car } from 'lucide-react';
+import { Check, ChevronDown, Shield, Info, AlertCircle, Clock, Plus, X, CreditCard, FileText, Car, HelpCircle, CheckCircle2 } from 'lucide-react';
 
 type Source = {
   id: string;
@@ -28,6 +28,7 @@ type Field = {
   hasMultipleIdentities?: boolean;
   lessPrivate?: boolean;
   derived?: boolean;
+  howItIsUsed?: string;
 };
 
 type Scenario = {
@@ -48,12 +49,13 @@ type Scenario = {
 type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'missing-required' | 'excessive-fields' | 'previous-sharing' | 'separate-name-fields';
 
 export default function SelectiveDisclosureSingleSource() {
-  const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('age-verification');
+  const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('separate-name-fields');
   const [selectedFields, setSelectedFields] = useState<Record<string, boolean>>({});
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [selectedDataOptions, setSelectedDataOptions] = useState<Record<string, string>>({}); // fieldId -> sourceId
   const [expandedField, setExpandedField] = useState<string | null>(null);
   const [showScenarios, setShowScenarios] = useState(false);
+  const [shareSuccessful, setShareSuccessful] = useState(false);
 
   const scenarios: Record<ScenarioKey, Scenario> = {
     'age-verification': {
@@ -74,7 +76,8 @@ export default function SelectiveDisclosureSingleSource() {
           required: true,
           description: 'Prove you meet minimum age',
           privacyPreserving: true,
-          derived: true
+          derived: true,
+          howItIsUsed: 'To verify you meet the legal age requirement for entry'
         },
         { 
           id: 'alternativeProof',
@@ -115,7 +118,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To verify your identity for delivery confirmation'
         },
         { 
           id: 'fullAddress', 
@@ -125,7 +129,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'utility', name: "Utility Bill", value: '123 Main St, Austin, TX 78701' }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To deliver your package to the correct location'
         },
         { 
           id: 'phoneNumber', 
@@ -154,7 +159,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'drivers', name: "Driver's License", value: 'Sami Kandur', expired: false }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To verify your identity matches your travel documents'
         },
         { 
           id: 'photo', 
@@ -164,7 +170,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'drivers', name: "Driver's License", value: 'Photo available', expired: false }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To visually confirm your identity at security checkpoints'
         },
         { 
           id: 'dateOfBirth', 
@@ -174,7 +181,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'drivers', name: "Driver's License", value: 'March 15, 1996', expired: false }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To verify your identity and age for security purposes'
         }
       ]
     },
@@ -193,7 +201,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'passport', name: 'Passport', value: 'Sami Kandur' }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To register you for the conference and create your badge'
         },
         { 
           id: 'professionalLicense', 
@@ -298,7 +307,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'drivers', name: "Driver's License", value: 'Sami' }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To verify your identity and match your reservation'
         },
         {
           id: 'lastName',
@@ -308,7 +318,8 @@ export default function SelectiveDisclosureSingleSource() {
             { id: 'drivers', name: "Driver's License", value: 'Kandur' }
           ],
           required: true,
-          description: ''
+          description: '',
+          howItIsUsed: 'To verify your identity and match your reservation'
         },
         {
           id: 'dateOfBirth',
@@ -548,7 +559,7 @@ export default function SelectiveDisclosureSingleSource() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto">
       {/* Demo Controls */}
-      <div className="scenario-dropdown-container bg-gray-800 px-4 py-3 border-b-2 border-yellow-400 relative z-50">
+      {/* <div className="scenario-dropdown-container bg-gray-800 px-4 py-3 border-b-2 border-yellow-400 relative z-50">
         <div className="text-xs text-yellow-400 font-bold mb-1 flex items-center gap-2">
           <span>⚙️ DEMO CONTROLS (NOT PART OF ACTUAL UI)</span>
         </div>
@@ -590,8 +601,79 @@ export default function SelectiveDisclosureSingleSource() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
+      {/* Success Screen */}
+      {shareSuccessful ? (
+        <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto">
+          {/* Header */}
+          <div className="bg-white border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center justify-center">
+              <div className="text-sm font-semibold text-gray-900">Share Complete</div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+            {/* Success Icon */}
+            <div className="w-24 h-24 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <CheckCircle2 className="w-16 h-16 text-violet-600" />
+            </div>
+
+            {/* Success Message */}
+            <h2 className="text-3xl font-bold text-gray-900 mb-3 text-center">Shared Successfully!</h2>
+            <p className="text-base text-gray-600 mb-8 text-center px-4">
+              Your information has been securely shared with {currentData.verifier.name}.
+            </p>
+
+            {/* Shared Details */}
+            <div className="bg-white rounded-xl p-5 mb-8 w-full border border-gray-200 shadow-sm">
+              <div className="text-sm font-semibold text-gray-700 mb-4">Shared Data</div>
+              <div className="space-y-3">
+                {currentData.fields
+                  .filter((f: Field) => selectedFields[f.id])
+                  .map((field: Field) => (
+                    <div key={field.id} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-violet-600 flex-shrink-0" />
+                      <span className="text-base text-gray-900">{field.label}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="bg-white border-t border-gray-200 px-4 py-6 space-y-3">
+            <button
+              onClick={() => {
+                setShareSuccessful(false);
+                // Reset selections
+                setSelectedFields({});
+                setSelectedDataOptions({});
+                setSelectedSource(null);
+                setExpandedField(null);
+              }}
+              className="w-full bg-violet-600 text-white font-semibold py-4 rounded-xl hover:bg-violet-700 transition-colors"
+            >
+              Done
+            </button>
+            <button
+              onClick={() => {
+                setShareSuccessful(false);
+                // Reset selections
+                setSelectedFields({});
+                setSelectedDataOptions({});
+                setSelectedSource(null);
+                setExpandedField(null);
+              }}
+              className="w-full text-violet-600 font-medium py-3 text-sm hover:text-violet-700 transition-colors"
+            >
+              View Sharing History
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -885,8 +967,11 @@ export default function SelectiveDisclosureSingleSource() {
                           </div>
                           <p className={`text-sm mt-1 font-medium ${isSelected ? 'text-violet-700' : 'text-gray-700'
                             }`}>{displayValue}</p>
-                          {field.derived && !hasMultipleOptions && (
-                            <span className="text-xs text-green-600 mt-1 inline-block">Privacy-preserving</span>
+                          {field.required && field.howItIsUsed && (
+                            <div className="mt-2 flex items-start gap-1.5">
+                              <HelpCircle className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
+                              <p className="text-xs text-gray-600 leading-relaxed">{field.howItIsUsed}</p>
+                            </div>
                           )}
                           
                           {/* Data Option Selector - Show when multiple options available */}
@@ -897,9 +982,6 @@ export default function SelectiveDisclosureSingleSource() {
                                 className="w-full text-left text-xs text-violet-600 hover:text-violet-700 flex items-center gap-1"
                               >
                                 <span>{selectedSourceForField?.derived ? 'Calculated' : 'Original'} data</span>
-                                {selectedSourceForField?.derived && (
-                                  <span className="text-green-600">• Privacy-preserving</span>
-                                )}
                                 <ChevronDown className={`w-3 h-3 ml-auto transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                               </button>
 
@@ -925,11 +1007,6 @@ export default function SelectiveDisclosureSingleSource() {
                                           }`}>
                                             {source.derived ? 'Calculated' : 'Original'}
                                           </span>
-                                          {source.derived && (
-                                            <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
-                                              Privacy-Preserving
-                                            </span>
-                                          )}
                                           {source.expired && !field.unchangingData && (
                                             <span className="text-xs text-red-600 flex items-center gap-1">
                                               <Clock className="w-3 h-3" />
@@ -985,6 +1062,11 @@ export default function SelectiveDisclosureSingleSource() {
         <div className="bg-white border-t border-gray-200 px-4 py-4 mt-auto">
           <button 
             disabled={!canProceed}
+                  onClick={() => {
+                    if (canProceed) {
+                      setShareSuccessful(true);
+                    }
+                  }}
             className={`w-full font-semibold py-4 rounded-xl shadow-sm transition-colors ${
               !canProceed 
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -1003,6 +1085,8 @@ export default function SelectiveDisclosureSingleSource() {
             }
           </p>
         </div>
+      )}
+        </>
       )}
     </div>
   );
