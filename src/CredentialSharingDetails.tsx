@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Clock, MapPin, Shield, CreditCard, User, ChevronDown, ArrowUpDown, Search, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Shield, CreditCard, User, ChevronDown, ArrowUpDown, Search } from 'lucide-react';
 import headerBackground from './Updated_ID_Cards.png';
 
 type SharingEvent = {
@@ -65,8 +65,8 @@ const mockSharingEvents: SharingEvent[] = [
 export default function CredentialSharingDetails() {
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  // const [searchQuery, setSearchQuery] = useState('');
+  // const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showEmptyState, setShowEmptyState] = useState(false);
 
   const toggleEvent = (eventId: string) => {
@@ -112,16 +112,16 @@ export default function CredentialSharingDetails() {
   const filteredAndSortedEvents = useMemo(() => {
     let filtered = [...mockSharingEvents];
 
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(event =>
-        event.verifierName.toLowerCase().includes(query) ||
-        event.location.toLowerCase().includes(query) ||
-        event.purpose?.toLowerCase().includes(query) ||
-        event.sharedFields.some(field => field.toLowerCase().includes(query))
-      );
-    }
+    // Apply search filter (commented out for now)
+    // if (searchQuery.trim()) {
+    //   const query = searchQuery.toLowerCase();
+    //   filtered = filtered.filter(event =>
+    //     event.verifierName.toLowerCase().includes(query) ||
+    //     event.location.toLowerCase().includes(query) ||
+    //     event.purpose?.toLowerCase().includes(query) ||
+    //     event.sharedFields.some(field => field.toLowerCase().includes(query))
+    //   );
+    // }
 
     // Sort
     return filtered.sort((a, b) => {
@@ -129,7 +129,7 @@ export default function CredentialSharingDetails() {
       const dateB = new Date(b.timestamp).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [searchQuery, sortOrder]);
+  }, [sortOrder]);
 
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
@@ -271,16 +271,16 @@ export default function CredentialSharingDetails() {
           )}
 
           {/* Results Count */}
-          {!showEmptyState && searchQuery && (
+          {/* {!showEmptyState && searchQuery && (
             <div className="mb-3 text-xs text-gray-500">
               {filteredAndSortedEvents.length} {filteredAndSortedEvents.length === 1 ? 'result' : 'results'} found
             </div>
-          )}
+          )} */}
 
           {/* Events List */}
           {!showEmptyState && (
             <div className="space-y-2.5 flex-1 overflow-y-auto">
-              {filteredAndSortedEvents.map((event, index) => {
+              {filteredAndSortedEvents.map((event) => {
             const isExpanded = expandedEvents.has(event.id);
 
             return (
@@ -352,19 +352,9 @@ export default function CredentialSharingDetails() {
           {/* Empty State */}
           {(showEmptyState || filteredAndSortedEvents.length === 0) && (
             <div className="text-center py-12">
-              {searchQuery ? (
-                <>
-                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No results found</p>
-                  <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
-                </>
-              ) : (
-                <>
-                  <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No sharing history yet</p>
-                  <p className="text-xs text-gray-400 mt-1">This credential hasn't been shared with anyone</p>
-                </>
-              )}
+              <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No sharing history yet</p>
+              <p className="text-xs text-gray-400 mt-1">This credential hasn't been shared with anyone</p>
             </div>
           )}
         </div>
