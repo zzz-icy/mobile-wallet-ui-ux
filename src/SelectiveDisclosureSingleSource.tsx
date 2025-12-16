@@ -684,7 +684,7 @@ export default function SelectiveDisclosureSingleSource() {
       </div>
 
       {/* Request Info Card */}
-      <div className="bg-white mx-4 mt-4 rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white mx-4 mt-4 rounded-xl p-4 shadow-sm border border-gray-200">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <Shield className="w-6 h-6 text-violet-600" />
@@ -741,7 +741,7 @@ export default function SelectiveDisclosureSingleSource() {
 
       {/* Excessive Request Warning */}
       {currentData.excessiveRequest && (
-        <div className="mx-4 mt-4 bg-red-50 border-2 border-red-300 rounded-2xl p-4">
+              <div className="mx-4 mt-4 bg-red-50 border-2 border-red-300 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -767,7 +767,7 @@ export default function SelectiveDisclosureSingleSource() {
 
       {/* Previous Sharing Notice */}
       {currentData.previouslyShared && (
-        <div className="mx-4 mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-4">
+              <div className="mx-4 mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -785,7 +785,7 @@ export default function SelectiveDisclosureSingleSource() {
 
       {/* Missing Required Fields Warning */}
       {hasMissingRequired && !currentData.excessiveRequest && (
-        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4">
+              <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">

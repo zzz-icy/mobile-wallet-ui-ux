@@ -5,9 +5,9 @@ export default function OnboardingWelcomeOriginal() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 flex flex-col max-w-md mx-auto">
       {/* Header */}
-          <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100 px-5 py-3 sticky top-0 z-20">
+          <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
         <div className="flex items-center justify-center">
-                  <div className="text-base font-bold text-gray-900">Welcome to iDen2</div>
+                  <div className="text-sm font-semibold text-gray-900">Welcome to iDen2</div>
         </div>
       </div>
 
@@ -60,7 +60,7 @@ export default function OnboardingWelcomeOriginal() {
               {/* Steps Flow */}
               <div className="space-y-0">
                   {/* Step 1 */}
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
                               <Plus className="w-6 h-6 text-white" strokeWidth={2} />
@@ -80,7 +80,7 @@ export default function OnboardingWelcomeOriginal() {
                   </div>
 
                   {/* Step 2 */}
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
                               <QrCode className="w-6 h-6 text-white" strokeWidth={2} />
@@ -100,7 +100,7 @@ export default function OnboardingWelcomeOriginal() {
                   </div>
 
                   {/* Step 3 */}
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
                       <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
                               <Eye className="w-6 h-6 text-white" strokeWidth={2} />
@@ -139,8 +139,8 @@ export default function OnboardingWelcomeOriginal() {
       </div>
 
           {/* Bottom Action - Sticky Footer */}
-          <div className="bg-white/80 backdrop-blur-sm border-t border-gray-100 px-6 py-4 safe-area-inset-bottom sticky bottom-0 z-20 shadow-lg shadow-black/5">
-              <button className="w-full bg-gradient-to-r from-violet-600 to-violet-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-violet-200/50 hover:shadow-xl hover:shadow-violet-200/60 hover:from-violet-700 hover:to-violet-800 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]">
+          <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 px-4 py-4 safe-area-inset-bottom sticky bottom-0 z-20 shadow-lg shadow-black/5">
+              <button className="w-full bg-violet-600 text-white font-semibold py-4 rounded-xl hover:bg-violet-700 transition-colors flex items-center justify-center gap-2">
                   <Plus className="w-4 h-4" strokeWidth={1.5} />
                   <span className="text-sm">Add Your First ID</span>
               </button>
@@ -149,7 +149,7 @@ export default function OnboardingWelcomeOriginal() {
                       // Handle "Do it later" action
                       console.log('Do it later clicked');
                   }}
-                  className="w-full bg-white border border-violet-300 text-violet-700 font-semibold text-sm py-3 rounded-xl mt-3 hover:bg-violet-50 hover:border-violet-400 active:bg-violet-100 active:scale-[0.98] transition-all duration-200 shadow-sm"
+                  className="w-full bg-white border border-gray-200 text-violet-600 font-medium text-sm py-3 rounded-xl mt-3 hover:bg-gray-50 hover:border-gray-300 transition-colors"
               >
                   Do It Later
               </button>
