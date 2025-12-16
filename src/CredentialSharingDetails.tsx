@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Clock, MapPin, Shield, CreditCard, User, ChevronDown, ArrowUpDown, Search } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Shield, CreditCard, User, ChevronDown, ArrowUpDown } from 'lucide-react';
 import headerBackground from './Updated_ID_Cards.png';
 
 type SharingEvent = {
