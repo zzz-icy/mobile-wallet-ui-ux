@@ -559,7 +559,7 @@ export default function SelectiveDisclosureSingleSource() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto">
       {/* Demo Controls */}
-      {/* <div className="scenario-dropdown-container bg-gray-800 px-4 py-3 border-b-2 border-yellow-400 relative z-50">
+      <div className="scenario-dropdown-container bg-gray-800 px-4 py-3 border-b-2 border-yellow-400 relative z-50">
         <div className="text-xs text-yellow-400 font-bold mb-1 flex items-center gap-2">
           <span>⚙️ DEMO CONTROLS (NOT PART OF ACTUAL UI)</span>
         </div>
@@ -601,7 +601,7 @@ export default function SelectiveDisclosureSingleSource() {
             ))}
           </div>
         )}
-      </div> */}
+      </div>
 
       {/* Success Screen */}
       {shareSuccessful ? (
