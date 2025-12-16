@@ -67,6 +67,7 @@ export default function CredentialSharingDetails() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [showEmptyState, setShowEmptyState] = useState(false);
 
   const toggleEvent = (eventId: string) => {
     setExpandedEvents(prev => {
@@ -140,7 +141,7 @@ export default function CredentialSharingDetails() {
     <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto">
       {/* Header Section with Dark Background */}
       <div 
-        className="relative overflow-hidden"
+        className="relative overflow-hidden pb-8"
         style={{
           backgroundImage: `url("${headerBackground}")`,
           backgroundSize: 'cover',
@@ -193,88 +194,107 @@ export default function CredentialSharingDetails() {
         </div>
       </div>
 
+      {/* Demo Button - Fixed Position Outside Mobile View */}
+      <button
+        onClick={() => setShowEmptyState(!showEmptyState)}
+        className="fixed top-20 right-4 px-3 py-1.5 text-xs font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors shadow-md z-50"
+      >
+        {showEmptyState ? 'Show Events' : 'Show Empty State'}
+      </button>
+
       {/* Sharing Events List */}
-      <div className="flex-1 px-4 mt-8 pb-6">
-        {/* Summary Stats - User-Friendly */}
-        <div className="mb-3 px-3 py-2.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-violet-600" />
-              <span className="text-xs font-semibold text-gray-900">Your Sharing Activity</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-violet-700">{summaryStats.totalShares}</span>
-              <span className="text-xs text-gray-600">
-                {summaryStats.totalShares === 1 ? 'time shared' : 'times shared'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Controls */}
-        <div className="mb-4">
-          {/* Search Bar - Expandable */}
-          <div className="flex items-center gap-2">
-            {!isSearchFocused && !searchQuery ? (
-              <button
-                onClick={() => setIsSearchFocused(true)}
-                className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors flex-shrink-0"
-              >
-                <Search className="w-4 h-4 text-gray-400" />
-              </button>
-            ) : (
-              <div className="relative flex-1 transition-all duration-300 ease-in-out">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search by verifier, location, or data..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => {
-                    if (!searchQuery) {
-                      setIsSearchFocused(false);
-                    }
-                  }}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
-                />
+      <div className="flex-1 flex flex-col -mt-8">
+        {/* Card Container for Entire Section After Header */}
+        <div className="bg-white rounded-t-3xl border-t border-x border-gray-200 shadow-lg shadow-gray-900/5 p-6 flex-1 flex flex-col relative z-10">
+          {/* Sharing History Header */}
+          <div className="mb-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1.5 h-7 bg-gradient-to-b from-violet-500 via-violet-600 to-purple-600 rounded-full shadow-sm shadow-violet-500/30"></div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900 tracking-tight">Sharing History</h3>
+                <p className="text-[10px] text-gray-500 mt-1">See when, where, and what you've shared</p>
               </div>
-            )}
-            {/* Sort Button */}
-            <button
-              onClick={toggleSortOrder}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-gray-700 hover:bg-gray-100 transition-colors border border-gray-200 flex-shrink-0"
-            >
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span className="font-medium">{sortOrder === 'newest' ? 'Newest' : 'Oldest'}</span>
-            </button>
+            </div>
           </div>
-        </div>
 
-        {/* Results Count */}
-        {searchQuery && (
-          <div className="mb-3 text-xs text-gray-500">
-            {filteredAndSortedEvents.length} {filteredAndSortedEvents.length === 1 ? 'result' : 'results'} found
-          </div>
-        )}
+          {/* Search and Controls */}
+          {!showEmptyState && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between gap-2">
+                {/* Event Count - Left */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-200/60 shadow-sm">
+                  <span className="text-xs font-semibold text-violet-700">
+                    {summaryStats.totalShares} {summaryStats.totalShares === 1 ? 'event' : 'shares'}
+                  </span>
+                </div>
 
-        {/* Events List */}
-        <div className="space-y-2.5">
-          {filteredAndSortedEvents.map((event, index) => {
+                {/* Search and Sort - Right */}
+                <div className="flex items-center gap-2">
+                  {/* Search Bar - Minimal */}
+                  {/* {!isSearchFocused && !searchQuery ? (
+                    <button
+                      onClick={() => setIsSearchFocused(true)}
+                      className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm flex-shrink-0"
+                    >
+                      <Search className="w-4 h-4 text-gray-400" />
+                    </button>
+                  ) : (
+                    <div className="relative flex-1 transition-all duration-300 ease-in-out">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="Search by verifier, location, or data..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)}
+                        onBlur={() => {
+                          if (!searchQuery) {
+                            setIsSearchFocused(false);
+                          }
+                        }}
+                        className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent focus:shadow-sm transition-all duration-300 shadow-sm"
+                      />
+                    </div>
+                  )} */}
+
+                  {/* Sort Button */}
+                  <button
+                    onClick={toggleSortOrder}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all border border-gray-200 shadow-sm"
+                  >
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    <span className="font-medium">{sortOrder === 'newest' ? 'Newest' : 'Oldest'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Results Count */}
+          {!showEmptyState && searchQuery && (
+            <div className="mb-3 text-xs text-gray-500">
+              {filteredAndSortedEvents.length} {filteredAndSortedEvents.length === 1 ? 'result' : 'results'} found
+            </div>
+          )}
+
+          {/* Events List */}
+          {!showEmptyState && (
+            <div className="space-y-2.5 flex-1 overflow-y-auto">
+              {filteredAndSortedEvents.map((event, index) => {
             const isExpanded = expandedEvents.has(event.id);
 
             return (
               <div
                 key={event.id}
                 className={`bg-white rounded-xl overflow-hidden transition-all ${isExpanded
-                    ? 'border-2 border-violet-200 shadow-md'
-                    : 'border border-gray-200 shadow-sm'
+                  ? 'border-2 border-violet-200 shadow-lg shadow-violet-200/20'
+                  : 'border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300'
                   }`}
               >
                 {/* Collapsed Header - Enhanced */}
                 <button
                   onClick={() => toggleEvent(event.id)}
-                  className={`w-full p-4 flex items-center justify-between transition-colors text-left ${isExpanded ? 'bg-violet-50/30' : 'hover:bg-gray-50'
+                  className={`w-full p-4 flex items-center justify-between transition-all text-left ${isExpanded ? 'bg-gradient-to-r from-violet-50/50 to-purple-50/30' : 'hover:bg-gray-50/80'
                     }`}
                 >
                   <div className="flex-1 min-w-0">
@@ -314,7 +334,7 @@ export default function CredentialSharingDetails() {
                         {event.sharedFields.map((field, fieldIndex) => (
                           <span
                             key={fieldIndex}
-                            className="inline-flex items-center px-2.5 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-medium border border-violet-200"
+                            className="inline-flex items-center px-2.5 py-1 rounded-md bg-gradient-to-r from-violet-100 to-purple-100 text-violet-800 text-xs font-medium border border-violet-200/60 shadow-sm"
                           >
                             {field}
                           </span>
@@ -326,26 +346,28 @@ export default function CredentialSharingDetails() {
               </div>
             );
           })}
-        </div>
+            </div>
+          )}
 
-        {/* Empty State */}
-        {filteredAndSortedEvents.length === 0 && (
-          <div className="text-center py-12">
-            {searchQuery ? (
-              <>
-                <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No results found</p>
-                <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
-              </>
-            ) : (
-              <>
+          {/* Empty State */}
+          {(showEmptyState || filteredAndSortedEvents.length === 0) && (
+            <div className="text-center py-12">
+              {searchQuery ? (
+                <>
+                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">No results found</p>
+                  <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+                </>
+              ) : (
+                <>
                   <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-sm text-gray-500">No sharing history yet</p>
                   <p className="text-xs text-gray-400 mt-1">This credential hasn't been shared with anyone</p>
-              </>
-            )}
-          </div>
-        )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
