@@ -195,22 +195,18 @@ export default function CredentialSharingDetails() {
 
       {/* Sharing Events List */}
       <div className="flex-1 px-4 mt-8 pb-6">
-        {/* Summary Stats - Compact One Line */}
-        <div className="mb-3 px-3 py-2 bg-white rounded-lg border border-gray-200 shadow-sm">
+        {/* Summary Stats - User-Friendly */}
+        <div className="mb-3 px-3 py-2.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-3.5 h-3.5 text-violet-600" />
-              <span className="text-xs font-semibold text-gray-900">Summary:</span>
+              <Shield className="w-4 h-4 text-violet-600" />
+              <span className="text-xs font-semibold text-gray-900">Your Sharing Activity</span>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold text-gray-900">{summaryStats.totalShares}</span>
-                <span className="text-xs text-gray-500">Shares</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold text-gray-900">{summaryStats.uniqueVerifiers}</span>
-                <span className="text-xs text-gray-500">Verifiers</span>
-              </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-base font-bold text-violet-700">{summaryStats.totalShares}</span>
+              <span className="text-xs text-gray-600">
+                {summaryStats.totalShares === 1 ? 'time shared' : 'times shared'}
+              </span>
             </div>
           </div>
         </div>
@@ -266,24 +262,23 @@ export default function CredentialSharingDetails() {
         <div className="space-y-2.5">
           {filteredAndSortedEvents.map((event, index) => {
             const isExpanded = expandedEvents.has(event.id);
-            const isMostRecent = index === 0 && sortOrder === 'newest';
 
             return (
               <div
                 key={event.id}
-                className={`bg-white rounded-xl overflow-hidden transition-all ${isMostRecent
-                  ? 'border-2 border-violet-200 shadow-md'
-                  : 'border border-gray-200 shadow-sm'
+                className={`bg-white rounded-xl overflow-hidden transition-all ${isExpanded
+                    ? 'border-2 border-violet-200 shadow-md'
+                    : 'border border-gray-200 shadow-sm'
                   }`}
               >
                 {/* Collapsed Header - Enhanced */}
                 <button
                   onClick={() => toggleEvent(event.id)}
-                  className={`w-full p-4 flex items-center justify-between transition-colors text-left ${isMostRecent ? 'bg-violet-50/30' : 'hover:bg-gray-50'
+                  className={`w-full p-4 flex items-center justify-between transition-colors text-left ${isExpanded ? 'bg-violet-50/30' : 'hover:bg-gray-50'
                     }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className={`font-semibold text-gray-900 ${isMostRecent ? 'text-base' : 'text-sm'} mb-1`}>
+                    <h4 className={`font-semibold text-gray-900 ${isExpanded ? 'text-base' : 'text-sm'} mb-1`}>
                       {event.verifierName}
                     </h4>
                     <div className="flex items-center gap-2 text-xs text-gray-500">

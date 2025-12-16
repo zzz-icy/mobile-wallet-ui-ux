@@ -5,11 +5,12 @@ import SelectiveDisclosureDemo from './SelectiveDisclosureDemo';
 import SelectiveDisclosureSingleSource from './SelectiveDisclosureSingleSource';
 import CredentialSharingDetails from './CredentialSharingDetails';
 
-type ViewType = 'onboarding' | 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing';
+type ViewType = 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing'
+// | 'onboarding';
 
 const viewLabels: Record<ViewType, string> = {
-  'onboarding': 'New Onboarding',
-  'onboarding-original': 'Original Onboarding',
+  // 'onboarding': 'New Onboarding',
+  'onboarding-original': 'Onboarding',
   'disclosure': 'Disclosure',
   'disclosure-single': 'Disclosure (Single Source)',
   'credential-sharing': 'Credential Sharing Details'
@@ -53,7 +54,7 @@ export default function App() {
             {viewLabels[currentView]}
           </span>
           <span className="sm:hidden truncate text-xs">
-            {currentView === 'onboarding' && 'New'}
+            {/* {currentView === 'onboarding' && 'New'} */}
             {currentView === 'onboarding-original' && 'Original'}
             {currentView === 'disclosure' && 'Disclosure'}
             {currentView === 'disclosure-single' && 'Single'}
