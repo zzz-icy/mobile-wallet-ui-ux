@@ -48,7 +48,11 @@ type Scenario = {
 
 type ScenarioKey = 'age-verification' | 'address-verification' | 'expired-credential' | 'missing-required' | 'excessive-fields' | 'previous-sharing' | 'separate-name-fields';
 
-export default function SelectiveDisclosureSingleSource() {
+type SelectiveDisclosureSingleSourceProps = {
+  onNavigateToDetails?: () => void;
+};
+
+export default function SelectiveDisclosureSingleSource({ onNavigateToDetails }: SelectiveDisclosureSingleSourceProps) {
   const [currentScenario, setCurrentScenario] = useState<ScenarioKey>('separate-name-fields');
   const [selectedFields, setSelectedFields] = useState<Record<string, boolean>>({});
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
@@ -652,6 +656,9 @@ export default function SelectiveDisclosureSingleSource() {
                 setSelectedDataOptions({});
                 setSelectedSource(null);
                 setExpandedField(null);
+                if (onNavigateToDetails) {
+                  onNavigateToDetails();
+                }
               }}
               className="w-full bg-violet-600 text-white font-semibold py-4 rounded-xl hover:bg-violet-700 transition-colors"
             >
@@ -659,12 +666,9 @@ export default function SelectiveDisclosureSingleSource() {
             </button>
             <button
               onClick={() => {
-                setShareSuccessful(false);
-                // Reset selections
-                setSelectedFields({});
-                setSelectedDataOptions({});
-                setSelectedSource(null);
-                setExpandedField(null);
+                if (onNavigateToDetails) {
+                  onNavigateToDetails();
+                }
               }}
               className="w-full text-violet-600 font-medium py-3 text-sm hover:text-violet-700 transition-colors"
             >

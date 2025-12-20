@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import OnboardingWelcomeOriginal from './OnboardingWelcomeOriginal';
+import OnboardingFlow from './OnboardingFlow';
 import SelectiveDisclosureDemo from './SelectiveDisclosureDemo';
 import SelectiveDisclosureSingleSource from './SelectiveDisclosureSingleSource';
 import CredentialSharingDetails from './CredentialSharingDetails';
 
-type ViewType = 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing'
-// | 'onboarding';
+type ViewType = 'onboarding' | 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing';
 
 const viewLabels: Record<ViewType, string> = {
-  // 'onboarding': 'New Onboarding',
-  'onboarding-original': 'Onboarding',
+  'onboarding': 'Onboarding (New)',
+  'onboarding-original': 'Onboarding (Original)',
   'disclosure': 'Disclosure',
   'disclosure-single': 'Disclosure (Single Source)',
   'credential-sharing': 'Credential Sharing Details'
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewType>('credential-sharing');
+  const [currentView, setCurrentView] = useState<ViewType>('onboarding');
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Close dropdown when clicking outside
@@ -54,7 +54,7 @@ export default function App() {
             {viewLabels[currentView]}
           </span>
           <span className="sm:hidden truncate text-xs">
-            {/* {currentView === 'onboarding' && 'New'} */}
+            {currentView === 'onboarding' && 'New'}
             {currentView === 'onboarding-original' && 'Original'}
             {currentView === 'disclosure' && 'Disclosure'}
             {currentView === 'disclosure-single' && 'Single'}
@@ -81,10 +81,10 @@ export default function App() {
         )}
       </div> 
 
-      {/* {currentView === 'onboarding' && <OnboardingWelcome />} */}
+      {currentView === 'onboarding' && <OnboardingFlow />}
       {currentView === 'onboarding-original' && <OnboardingWelcomeOriginal />}
       {currentView === 'disclosure' && <SelectiveDisclosureDemo />}
-      {currentView === 'disclosure-single' && <SelectiveDisclosureSingleSource />}
+      {currentView === 'disclosure-single' && <SelectiveDisclosureSingleSource onNavigateToDetails={() => handleViewChange('credential-sharing')} />}
       {currentView === 'credential-sharing' && <CredentialSharingDetails />}
     </>
   );
