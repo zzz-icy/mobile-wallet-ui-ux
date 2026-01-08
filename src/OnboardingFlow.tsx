@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { ArrowRight, ArrowLeft, Shield, QrCode, Copy, User, Key, Lock, FileText, Share2, CreditCard, Settings, Plus, Eye } from 'lucide-react';
 import iden2Logo from './iden2_logo.png';
 import iden2FullLogo from './iden2_full_logo.svg';
-import appIcon from './appicon-512.png';
 
 type OnboardingStep = 'intro' | 'create-or-login' | 'create-passkey' | 'recovery-code' | 'welcome' | 'login' | 'next-steps' | 'account-recovery';
 type IntroSlide = 0 | 1 | 2;

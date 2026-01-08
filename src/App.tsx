@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
 import OnboardingWelcomeOriginal from './OnboardingWelcomeOriginal';
 import OnboardingFlow from './OnboardingFlow';
 import SelectiveDisclosureDemo from './SelectiveDisclosureDemo';
@@ -8,13 +7,13 @@ import CredentialSharingDetails from './CredentialSharingDetails';
 
 type ViewType = 'onboarding' | 'onboarding-original' | 'disclosure' | 'disclosure-single' | 'credential-sharing';
 
-const viewLabels: Record<ViewType, string> = {
-  'onboarding': 'Onboarding (New)',
-  'onboarding-original': 'Onboarding (Original)',
-  'disclosure': 'Disclosure',
-  'disclosure-single': 'Disclosure (Single Source)',
-  'credential-sharing': 'Credential Sharing Details'
-};
+// const viewLabels: Record<ViewType, string> = {
+//   'onboarding': 'Onboarding (New)',
+//   'onboarding-original': 'Onboarding (Original)',
+//   'disclosure': 'Disclosure',
+//   'disclosure-single': 'Disclosure (Single Source)',
+//   'credential-sharing': 'Credential Sharing Details'
+// };
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('onboarding');
