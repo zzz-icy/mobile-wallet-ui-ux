@@ -18,6 +18,8 @@ export default function OnboardingFlow() {
   const [passkeyError, setPasskeyError] = useState<string | null>(null);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  const [recoveryCodeInput, setRecoveryCodeInput] = useState('');
+  const [recoveryType, setRecoveryType] = useState<'username-only' | 'full-recovery'>('username-only');
 
   // Mock IDs data for returning user
   const mockIds = [
@@ -527,7 +529,7 @@ export default function OnboardingFlow() {
                   Account Recovery
                 </h1>
                 <p className="text-sm text-gray-600 max-w-[280px] mx-auto leading-relaxed">
-                  Recover access to your wallet using your recovery email
+                  Use your recovery code to restore access to your wallet
                 </p>
               </div>
             </div>
@@ -535,48 +537,117 @@ export default function OnboardingFlow() {
             {/* Middle Section */}
             <div className="flex-1 flex items-center justify-center py-4 min-h-0">
               <div className="w-full relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-2xl shadow-violet-200/50 border border-violet-200/60 overflow-hidden">
-                <div className="relative">
-                  <label className="block text-sm font-bold text-gray-800 mb-4 tracking-wide">
-                    Recovery Email
-                  </label>
-                  <div className="relative mb-6">
-                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-violet-500" />
-                    <input
-                      type="email"
-                      placeholder="Enter your recovery email"
-                      value={recoveryEmail}
-                      onChange={(e) => setRecoveryEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 text-base font-medium bg-white border-2 border-violet-200/70 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400 focus:shadow-xl focus:shadow-violet-300/30 transition-all duration-300 placeholder:text-gray-400"
-                    />
+                <div className="relative space-y-6">
+                  {/* Recovery Code Input */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-4 tracking-wide">
+                      Recovery Code
+                    </label>
+                    <div className="relative">
+                      <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-violet-500" />
+                      <textarea
+                        placeholder="Paste your recovery code here"
+                        value={recoveryCodeInput}
+                        onChange={(e) => setRecoveryCodeInput(e.target.value)}
+                        onPaste={(e) => {
+                          const pastedText = e.clipboardData.getData('text');
+                          setRecoveryCodeInput(pastedText.trim());
+                        }}
+                        rows={3}
+                        className="w-full pl-12 pr-4 py-4 text-base font-medium bg-white border-2 border-violet-200/70 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400 focus:shadow-xl focus:shadow-violet-300/30 transition-all duration-300 placeholder:text-gray-400 resize-none"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed mt-2">
+                      Paste one of your recovery codes to restore access
+                    </p>
                   </div>
 
-                  <p className="text-xs text-gray-500 leading-relaxed mb-6 text-center">
-                    We'll send recovery instructions to this email address
-                  </p>
+                  {/* Recovery Type Selection */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-4 tracking-wide">
+                      Recovery Type
+                    </label>
+                    <div className="space-y-3">
+                      {/* Username Only Option */}
+                      <button
+                        onClick={() => setRecoveryType('username-only')}
+                        className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                          recoveryType === 'username-only'
+                            ? 'border-violet-500 bg-violet-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            recoveryType === 'username-only'
+                              ? 'border-violet-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {recoveryType === 'username-only' && (
+                              <div className="w-3 h-3 bg-violet-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">Username Only</p>
+                            <p className="text-xs text-gray-600">Recover your username only</p>
+                          </div>
+                        </div>
+                      </button>
 
+                      {/* Full Recovery Option */}
+                      <button
+                        onClick={() => setRecoveryType('full-recovery')}
+                        className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                          recoveryType === 'full-recovery'
+                            ? 'border-violet-500 bg-violet-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            recoveryType === 'full-recovery'
+                              ? 'border-violet-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {recoveryType === 'full-recovery' && (
+                              <div className="w-3 h-3 bg-violet-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">Full Recovery</p>
+                            <p className="text-xs text-gray-600">Recover full wallet access</p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Recover Button */}
                   <button
                     onClick={() => {
-                      if (recoveryEmail.trim()) {
-                        alert('Recovery email sent! Check your inbox.');
+                      if (recoveryCodeInput.trim()) {
+                        const type = recoveryType === 'username-only' ? 'username' : 'full wallet';
+                        alert(`Recovery initiated! Recovering ${type} access...`);
                         setCurrentStep('create-or-login');
                       }
                     }}
-                    disabled={!recoveryEmail.trim()}
-                    className={`w-full rounded-2xl transition-all duration-300 relative overflow-hidden ${!recoveryEmail.trim()
+                    disabled={!recoveryCodeInput.trim()}
+                    className={`w-full rounded-2xl transition-all duration-300 relative overflow-hidden ${!recoveryCodeInput.trim()
                       ? 'bg-gray-100 cursor-not-allowed shadow-sm'
                       : 'group shadow-xl shadow-violet-500/40'
                       }`}
                   >
-                    {!recoveryEmail.trim() ? (
+                    {!recoveryCodeInput.trim() ? (
                       <div className="py-5 flex items-center justify-center gap-3">
-                        <span className="text-gray-400 font-bold text-base">Enter recovery email</span>
+                        <span className="text-gray-400 font-bold text-base">Enter recovery code</span>
                       </div>
                     ) : (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 transition-all duration-700"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600"></div>
                         <div className="relative py-5 flex items-center justify-center gap-3">
-                          <span className="text-white font-bold text-lg tracking-wide">Send Recovery Email</span>
-                          <ArrowRight className="w-6 h-6 text-white drop-shadow-md transition-transform duration-300" strokeWidth={2.5} />
+                          <span className="text-white font-bold text-base tracking-wide">
+                            {recoveryType === 'username-only' ? 'Recover Username' : 'Recover Wallet'}
+                          </span>
                         </div>
                       </>
                     )}
