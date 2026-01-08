@@ -293,28 +293,33 @@ export default function OnboardingFlow() {
 
                   {/* Card */}
                   <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-violet-600 rounded-2xl p-6 shadow-xl shadow-violet-500/40">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                          <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-lg font-bold text-white mb-0.5">Create Wallet</p>
-                          <p className="text-xs text-white/80">Get started with iDen2</p>
-                        </div>
+                    <div className="flex items-start gap-4">
+                      {/* Icon */}
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
                       </div>
-                      <ArrowRight className="w-5 h-5 text-white/90" strokeWidth={2.5} />
+                      
+                      {/* Text Content */}
+                      <div className="flex-1 text-left">
+                        <p className="text-base font-bold text-white mb-1">Create Wallet</p>
+                        <p className="text-xs text-white/80 mb-2">New to iDen2?</p>
+                        <p className="text-xs text-white/70 leading-relaxed">
+                          Store and manage your credentials securely on your device
+                        </p>
+                      </div>
+                      
+                      {/* Arrow */}
+                      <div className="flex-shrink-0 pt-1">
+                        <ArrowRight className="w-5 h-5 text-white/90" strokeWidth={2.5} />
+                      </div>
                     </div>
-                    <p className="text-xs text-white/70 leading-relaxed pl-15">
-                      Secure storage for your digital credentials
-                    </p>
                   </div>
                 </div>
               </button>
 
               {/* Divider Text */}
               <div className="text-center py-2">
-                <p className="text-xs text-gray-400 font-medium">Already have a wallet?</p>
+                <p className="text-xs text-gray-400 font-medium">or</p>
               </div>
 
               {/* Login - Secondary Action */}
@@ -323,17 +328,22 @@ export default function OnboardingFlow() {
                 className="w-full group active:scale-[0.98] transition-all duration-300"
               >
                 <div className="relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-gray-600" strokeWidth={2} />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-lg font-bold text-gray-900">Login</p>
-                        <p className="text-xs text-gray-500">Access your wallet</p>
-                      </div>
+                  <div className="flex items-start gap-4">
+                    {/* Icon */}
+                    <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Lock className="w-5 h-5 text-gray-600" strokeWidth={2} />
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={2.5} />
+                    
+                    {/* Text Content */}
+                    <div className="flex-1 text-left">
+                      <p className="text-base font-bold text-gray-900 mb-1">Login</p>
+                      <p className="text-xs text-gray-500">Already have a wallet?</p>
+                    </div>
+                    
+                    {/* Arrow */}
+                    <div className="flex-shrink-0 pt-1">
+                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={2.5} />
+                    </div>
                   </div>
                 </div>
               </button>
