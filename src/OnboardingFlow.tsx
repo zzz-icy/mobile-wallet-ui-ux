@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, ArrowLeft, Shield, QrCode, Copy, User, Key, Lock, FileText, Share2, CreditCard, Settings, Plus } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Shield, QrCode, Copy, User, Key, Lock, FileText, Share2, CreditCard, Settings, Plus, HelpCircle, X } from 'lucide-react';
 import iden2Logo from './iden2_logo.png';
 import iden2FullLogo from './iden2_full_logo.svg';
 
@@ -19,6 +19,7 @@ export default function OnboardingFlow() {
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [recoveryCodeInput, setRecoveryCodeInput] = useState('');
   const [recoveryType, setRecoveryType] = useState<'username-only' | 'full-recovery'>('username-only');
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   // Mock IDs data for returning user
   const mockIds = [
@@ -182,7 +183,7 @@ export default function OnboardingFlow() {
                     </div>
 
                     {/* Title */}
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4 text-center tracking-tight">
+                    <h1 className="text-3xl font-semibold text-gray-800 mb-4 text-center tracking-tight">
                       {slide.title}
                     </h1>
 
@@ -225,7 +226,7 @@ export default function OnboardingFlow() {
               {introSlide === 2 ? (
                 <button
                   onClick={handleNext}
-                  className="px-8 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 text-white rounded-full font-bold text-base shadow-xl shadow-violet-500/40 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="px-8 py-3.5 bg-violet-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-violet-500/30 hover:bg-violet-700 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
@@ -261,6 +262,87 @@ export default function OnboardingFlow() {
         <div className="absolute top-[-15%] right-[-10%] w-[70%] h-[40%] bg-gradient-to-br from-violet-300/30 to-purple-300/25 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-[-10%] left-[-15%] w-[60%] h-[35%] bg-gradient-to-tr from-purple-300/25 to-violet-300/20 rounded-full blur-[100px]"></div>
 
+
+        {/* Info Modal */}
+        {showInfoModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+              {/* Close Button */}
+              <button
+                onClick={() => setShowInfoModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" strokeWidth={2} />
+              </button>
+
+              {/* Modal Content */}
+              <div className="p-6 pt-8">
+                <div className="flex justify-center mb-6">
+                  <img
+                    src={iden2FullLogo}
+                    alt="iDen2"
+                    className="h-8 w-auto object-contain opacity-80"
+                  />
+                </div>
+
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
+                  About iDen2
+                </h2>
+
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-sm leading-relaxed">
+                    iDen2 is a secure digital identity wallet that puts you in control of your personal information.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <Shield className="w-5 h-5 text-violet-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800 mb-1">Privacy First</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          Your data stays on your device. We never see or store your personal information.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <QrCode className="w-5 h-5 text-violet-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800 mb-1">Easy Verification</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          Scan QR codes to verify your identity quickly and securely with businesses.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Share2 className="w-5 h-5 text-violet-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800 mb-1">Selective Disclosure</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          Choose exactly what information to share, keeping everything else private.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <a
+                      href="https://iden2.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-violet-600 text-white rounded-lg py-3 px-4 font-semibold text-sm shadow-lg shadow-violet-500/30 hover:bg-violet-700 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <span>Learn More</span>
+                      <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Content */}
         <div className="flex-1 flex flex-col px-8 relative z-10">
           <div className="w-full max-w-sm mx-auto flex-1 flex flex-col justify-between pt-44 pb-12">
@@ -272,7 +354,7 @@ export default function OnboardingFlow() {
                   alt="iDen2"
                   className="h-10 w-auto object-contain opacity-80 drop-shadow-sm"
                 />
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3 mt-8">
                   <p className="text-xs text-gray-500 font-semibold tracking-[0.2em] uppercase">
                     A PLATFORM FOR DIGITAL IDENTITY
                   </p>
@@ -290,19 +372,19 @@ export default function OnboardingFlow() {
               >
                 <div className="relative">
                   {/* Animated Glow */}
-                  <div className="absolute -inset-1 bg-violet-500/20 rounded-2xl blur-lg animate-pulse"></div>
+                  <div className="absolute -inset-1 bg-violet-500/20 rounded-lg blur-lg animate-pulse"></div>
 
                   {/* Card */}
-                  <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-violet-600 rounded-2xl p-6 shadow-xl shadow-violet-500/40">
+                  <div className="relative bg-violet-600 rounded-lg p-5 shadow-lg shadow-violet-500/30 hover:bg-violet-700 transition-colors">
                     <div className="flex items-start gap-4">
                       {/* Icon */}
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
                       </div>
                       
                       {/* Text Content */}
                       <div className="flex-1 text-left">
-                        <p className="text-base font-bold text-white mb-1">Create Wallet</p>
+                        <p className="text-sm font-semibold text-white mb-1">Create Wallet</p>
                         <p className="text-xs text-white/80 mb-2">New to iDen2?</p>
                         <p className="text-xs text-white/70 leading-relaxed">
                           Store and manage your credentials securely on your device
@@ -328,7 +410,7 @@ export default function OnboardingFlow() {
                 onClick={handleLogin}
                 className="w-full group active:scale-[0.98] transition-all duration-300"
               >
-                <div className="relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all">
+                <div className="relative bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-start gap-4">
                     {/* Icon */}
                     <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -337,7 +419,7 @@ export default function OnboardingFlow() {
                     
                     {/* Text Content */}
                     <div className="flex-1 text-left">
-                      <p className="text-base font-bold text-gray-900 mb-1">Login</p>
+                      <p className="text-base font-semibold text-gray-800 mb-1">Login</p>
                       <p className="text-xs text-gray-500">Already have a wallet?</p>
                     </div>
                     
@@ -348,6 +430,17 @@ export default function OnboardingFlow() {
                   </div>
                 </div>
               </button>
+
+              {/* Learn More Link - Bottom */}
+              <div className="pt-4 flex justify-center">
+                <button
+                  onClick={() => setShowInfoModal(true)}
+                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-violet-600 transition-colors"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" strokeWidth={2} />
+                  <span className="font-medium">Learn more about iDen2</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -389,7 +482,7 @@ export default function OnboardingFlow() {
 
               {/* Title */}
               <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-3 tracking-tight">
                   Set Up Your Wallet
                 </h1>
                 <p className="text-sm text-gray-600 max-w-[280px] mx-auto leading-relaxed">
@@ -403,7 +496,7 @@ export default function OnboardingFlow() {
               <div className="w-full relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-2xl shadow-violet-200/50 border border-violet-200/60 overflow-hidden">
                 <div className="relative">
                   <div className="mb-6">
-                    <label className="block text-sm font-bold text-gray-800 mb-2 tracking-wide">
+                    <label className="block text-sm font-semibold text-gray-800 mb-2 tracking-wide">
                       Username
                     </label>
                     <p className="text-xs text-gray-500 mb-4">
@@ -439,28 +532,19 @@ export default function OnboardingFlow() {
                   <button
                     onClick={handlePasskeyCreate}
                     disabled={!username.trim()}
-                    className={`w-full rounded-2xl transition-all duration-300 relative overflow-hidden ${!username.trim()
+                    className={`w-full rounded-lg transition-all duration-300 ${!username.trim()
                       ? 'bg-gray-100 cursor-not-allowed shadow-sm'
-                      : 'group shadow-xl shadow-violet-500/40'
+                      : 'bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/30'
                       }`}
                   >
                     {!username.trim() ? (
-                      <div className="py-5 flex items-center justify-center gap-3">
-                        <span className="text-gray-400 font-bold text-base">Enter username to continue</span>
+                      <div className="py-3.5 flex items-center justify-center gap-3">
+                        <span className="text-gray-400 font-bold text-sm">Enter username to continue</span>
                       </div>
                     ) : (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 transition-all duration-700"></div>
-                        <div className="relative py-5 flex items-center justify-center gap-3">
-                          <img
-                            src={iden2Logo}
-                            alt="iDen2 Logo"
-                            className="w-6 h-6 object-contain brightness-0 invert drop-shadow-md"
-                          />
-                          <span className="text-white font-bold text-lg tracking-wide">Create Passkey</span>
-                          <ArrowRight className="w-6 h-6 text-white drop-shadow-md transition-transform duration-300" strokeWidth={2.5} />
+                        <div className="py-3.5 flex items-center justify-center gap-3">
+                          <span className="text-white font-bold text-sm">Create Passkey</span>
                         </div>
-                      </>
                     )}
                   </button>
                 </div>
@@ -524,7 +608,7 @@ export default function OnboardingFlow() {
 
               {/* Title */}
               <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-4 tracking-tight">
                   Account Recovery
                 </h1>
                 <p className="text-sm text-gray-600 max-w-[280px] mx-auto leading-relaxed">
@@ -539,7 +623,7 @@ export default function OnboardingFlow() {
                 <div className="relative space-y-6">
                   {/* Recovery Code Input */}
                   <div>
-                    <label className="block text-sm font-bold text-gray-800 mb-4 tracking-wide">
+                    <label className="block text-sm font-semibold text-gray-800 mb-4 tracking-wide">
                       Recovery Code
                     </label>
                     <div className="relative">
@@ -563,14 +647,14 @@ export default function OnboardingFlow() {
 
                   {/* Recovery Type Selection */}
                   <div>
-                    <label className="block text-sm font-bold text-gray-800 mb-4 tracking-wide">
+                    <label className="block text-sm font-semibold text-gray-800 mb-4 tracking-wide">
                       Recovery Type
                     </label>
                     <div className="space-y-3">
                       {/* Username Only Option */}
                       <button
                         onClick={() => setRecoveryType('username-only')}
-                        className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                        className={`w-full p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                           recoveryType === 'username-only'
                             ? 'border-violet-500 bg-violet-50'
                             : 'border-gray-200 bg-white hover:border-gray-300'
@@ -587,7 +671,7 @@ export default function OnboardingFlow() {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-gray-900">Username Only</p>
+                            <p className="text-sm font-semibold text-gray-800">Username Only</p>
                             <p className="text-xs text-gray-600">Recover your username only</p>
                           </div>
                         </div>
@@ -596,7 +680,7 @@ export default function OnboardingFlow() {
                       {/* Full Recovery Option */}
                       <button
                         onClick={() => setRecoveryType('full-recovery')}
-                        className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                        className={`w-full p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                           recoveryType === 'full-recovery'
                             ? 'border-violet-500 bg-violet-50'
                             : 'border-gray-200 bg-white hover:border-gray-300'
@@ -613,7 +697,7 @@ export default function OnboardingFlow() {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-gray-900">Full Recovery</p>
+                            <p className="text-sm font-semibold text-gray-800">Full Recovery</p>
                             <p className="text-xs text-gray-600">Recover full wallet access</p>
                           </div>
                         </div>
@@ -631,24 +715,21 @@ export default function OnboardingFlow() {
                       }
                     }}
                     disabled={!recoveryCodeInput.trim()}
-                    className={`w-full rounded-2xl transition-all duration-300 relative overflow-hidden ${!recoveryCodeInput.trim()
+                    className={`w-full rounded-lg transition-all duration-300 ${!recoveryCodeInput.trim()
                       ? 'bg-gray-100 cursor-not-allowed shadow-sm'
-                      : 'group shadow-xl shadow-violet-500/40'
+                      : 'bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/30'
                       }`}
                   >
                     {!recoveryCodeInput.trim() ? (
-                      <div className="py-5 flex items-center justify-center gap-3">
-                        <span className="text-gray-400 font-bold text-base">Enter recovery code</span>
+                      <div className="py-3 flex items-center justify-center gap-3">
+                        <span className="text-gray-400 font-bold text-sm">Enter recovery code</span>
                       </div>
                     ) : (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600"></div>
-                        <div className="relative py-5 flex items-center justify-center gap-3">
-                          <span className="text-white font-bold text-base tracking-wide">
+                        <div className="py-3 flex items-center justify-center gap-3">
+                          <span className="text-white font-bold text-sm">
                             {recoveryType === 'username-only' ? 'Recover Username' : 'Recover Wallet'}
                           </span>
                         </div>
-                      </>
                     )}
                   </button>
                 </div>
@@ -704,7 +785,7 @@ export default function OnboardingFlow() {
 
               {/* Title */}
               <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-4 tracking-tight">
                   Welcome Back
                 </h1>
                 <p className="text-sm text-gray-600 max-w-[280px] mx-auto leading-relaxed">
@@ -735,27 +816,24 @@ export default function OnboardingFlow() {
                   <button
                     onClick={handleSignIn}
                     disabled={isSigningIn || !username.trim()}
-                    className={`w-full rounded-2xl transition-all duration-300 relative overflow-hidden ${isSigningIn || !username.trim()
+                    className={`w-full rounded-lg transition-all duration-300 ${isSigningIn || !username.trim()
                       ? 'bg-gray-100 cursor-not-allowed shadow-sm'
-                      : 'group shadow-xl shadow-violet-500/40'
+                      : 'bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/30'
                       }`}
                   >
                     {isSigningIn ? (
-                      <div className="py-5 flex items-center justify-center gap-3">
+                      <div className="py-3.5 flex items-center justify-center gap-3">
                         <div className="w-5 h-5 border-3 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-gray-400 font-bold text-base">Signing in...</span>
+                        <span className="text-gray-400 font-bold text-sm">Signing in...</span>
                       </div>
                     ) : !username.trim() ? (
-                      <div className="py-5 flex items-center justify-center gap-3">
-                        <span className="text-gray-400 font-bold text-base">Enter username to continue</span>
+                        <div className="py-3.5 flex items-center justify-center gap-3">
+                          <span className="text-gray-400 font-bold text-sm">Enter username to continue</span>
                       </div>
                     ) : (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600"></div>
-                        <div className="relative py-5 flex items-center justify-center gap-3">
-                          <span className="text-white font-bold text-base tracking-wide">Continue with Passkey</span>
-                        </div>
-                      </>
+                          <div className="py-3.5 flex items-center justify-center gap-3">
+                            <span className="text-white font-bold text-sm">Continue with Passkey</span>
+                          </div>
                     )}
                   </button>
                 </div>
@@ -808,7 +886,7 @@ export default function OnboardingFlow() {
 
                 {/* Title and Description */}
                 <div className="text-center mt-10">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-2 tracking-tight">
                     Save Your Recovery Codes
                   </h2>
                   <p className="text-xs text-gray-600 max-w-[280px] mx-auto leading-relaxed">
@@ -831,7 +909,7 @@ export default function OnboardingFlow() {
                             <span className="text-xs font-semibold text-gray-500 w-5 flex-shrink-0">
                               {index + 1}.
                             </span>
-                            <code className="text-sm font-mono font-bold text-gray-900 tracking-wider flex-1 truncate">
+                            <code className="text-sm font-mono font-bold text-gray-800 tracking-wider flex-1 truncate">
                               {code}
                             </code>
                           </div>
@@ -868,12 +946,9 @@ export default function OnboardingFlow() {
 
                 <button
                   onClick={handleNext}
-                  className="w-full rounded-2xl transition-all duration-300 relative overflow-hidden group shadow-xl shadow-violet-500/40"
+                  className="w-full bg-violet-600 text-white rounded-lg py-3 font-bold text-sm shadow-lg shadow-violet-500/30 hover:bg-violet-700 transition-all duration-300"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 transition-all duration-700"></div>
-                  <div className="relative py-5 flex items-center justify-center">
-                    <span className="text-white font-bold text-lg tracking-wide">I've Saved My Codes</span>
-                  </div>
+                  I've Saved My Codes
                 </button>
               </div>
             </div>
@@ -921,7 +996,7 @@ export default function OnboardingFlow() {
 
               {/* Title */}
               <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-4 tracking-tight">
                   Welcome Back
                 </h1>
                 <p className="text-sm text-gray-600 max-w-[280px] mx-auto leading-relaxed">
@@ -937,29 +1012,20 @@ export default function OnboardingFlow() {
                   <button
                     onClick={handleSignIn}
                     disabled={isSigningIn}
-                    className={`w-full rounded-2xl transition-all duration-300 ${isSigningIn
+                    className={`w-full rounded-lg transition-all duration-300 ${isSigningIn
                       ? 'bg-gray-100 cursor-not-allowed shadow-sm'
-                      : 'group shadow-xl shadow-violet-500/40'
+                      : 'bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/30'
                       }`}
                   >
                     {isSigningIn ? (
-                      <div className="py-5 flex items-center justify-center gap-3">
+                      <div className="py-3.5 flex items-center justify-center gap-3">
                         <div className="w-5 h-5 border-3 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-gray-400 font-bold text-base">Signing in...</span>
+                        <span className="text-gray-400 font-bold text-sm">Signing in...</span>
                       </div>
                     ) : (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 transition-all duration-700"></div>
-                        <div className="relative py-5 flex items-center justify-center gap-3">
-                          <img
-                            src={iden2Logo}
-                            alt="iDen2 Logo"
-                            className="w-6 h-6 object-contain brightness-0 invert drop-shadow-md"
-                          />
-                          <span className="text-white font-bold text-lg tracking-wide">Continue with Passkey</span>
-                          <ArrowRight className="w-6 h-6 text-white drop-shadow-md transition-transform duration-300" strokeWidth={2.5} />
+                        <div className="py-3.5 flex items-center justify-center gap-3">
+                          <span className="text-white font-bold text-sm">Continue with Passkey</span>
                         </div>
-                      </>
                     )}
                   </button>
                 </div>
@@ -1001,7 +1067,7 @@ export default function OnboardingFlow() {
                   </svg>
                 </div>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+              <h1 className="text-3xl font-semibold text-gray-800 mb-3 tracking-tight">
                 You're All Set!
               </h1>
               <p className="text-base text-gray-600 leading-relaxed max-w-sm mx-auto">
@@ -1019,9 +1085,9 @@ export default function OnboardingFlow() {
                       <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-900 mb-1">Add Your ID</p>
+                      <p className="text-sm font-semibold text-gray-800 mb-1">Add Your ID</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        Scan your government-issued ID
+                        Scan your government-issued ID, such as a passport or a driver's license
                       </p>
                     </div>
                   </div>
@@ -1034,7 +1100,7 @@ export default function OnboardingFlow() {
                       <QrCode className="w-6 h-6 text-violet-600" strokeWidth={2} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-900 mb-1">Scan QR Codes</p>
+                      <p className="text-sm font-semibold text-gray-800 mb-1">Scan QR Codes</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Scan when businesses request verification
                       </p>
@@ -1049,7 +1115,7 @@ export default function OnboardingFlow() {
                       <Share2 className="w-6 h-6 text-violet-600" strokeWidth={2} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-900 mb-1">Share Selectively</p>
+                      <p className="text-sm font-semibold text-gray-800 mb-1">Share Selectively</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Control what information to share
                       </p>
@@ -1063,16 +1129,14 @@ export default function OnboardingFlow() {
             <div className="space-y-3 flex-shrink-0">
               <button
                 onClick={() => console.log('Add ID - Not implemented yet')}
-                className="w-full group active:scale-[0.98] transition-all duration-300"
+                className="w-full bg-violet-600 text-white rounded-lg py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-violet-500/30 hover:bg-violet-700 active:scale-[0.98] transition-all duration-300"
               >
-                <div className="relative bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 rounded-2xl py-4 flex items-center justify-center gap-2 shadow-xl shadow-violet-500/40">
-                  <Plus className="w-5 h-5 text-white" strokeWidth={2} />
-                  <span className="text-white font-bold text-base">Add Your First ID</span>
-                </div>
+                <Plus className="w-4 h-4" strokeWidth={2} />
+                <span className="font-bold text-sm">Add Your First ID</span>
               </button>
               <button
                 onClick={() => console.log('Do It Later - Not implemented yet')}
-                className="w-full bg-white border border-gray-200 text-violet-600 font-medium text-sm py-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                className="w-full bg-white border border-gray-200 text-violet-600 font-medium text-sm py-3 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
               >
                 Do It Later
               </button>
@@ -1108,7 +1172,7 @@ export default function OnboardingFlow() {
                   setIsDashboardSpinning(false);
                 }, 500);
               }}
-              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl active:scale-95 transition-all duration-300 flex items-center gap-2 text-xs font-bold shadow-md group"
+              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg active:scale-95 transition-all duration-300 flex items-center gap-2 text-xs font-bold shadow-md group"
             >
               <Settings className={`w-4 h-4 transition-transform duration-500 ${isDashboardSpinning ? 'rotate-90' : ''}`} />
               <span>Dashboard</span>
@@ -1147,7 +1211,7 @@ export default function OnboardingFlow() {
                   alert('Processing request string...');
                 }
               }}
-              className="w-full p-10 bg-white border-2 border-gray-300 text-gray-900 rounded-3xl active:scale-[0.97] transition-all duration-300 flex flex-col items-center justify-center gap-5 shadow-xl group relative overflow-hidden"
+              className="w-full p-10 bg-white border-2 border-gray-300 text-gray-800 rounded-3xl active:scale-[0.97] transition-all duration-300 flex flex-col items-center justify-center gap-5 shadow-xl group relative overflow-hidden"
             >
               <div className="relative w-20 h-20 bg-gradient-to-br from-violet-100 to-purple-100 rounded-3xl flex items-center justify-center shadow-lg transition-all duration-300 ring-1 ring-violet-200/50">
                 <Copy className="w-10 h-10 text-violet-600 drop-shadow-sm transition-transform duration-300" strokeWidth={2.5} />
@@ -1172,7 +1236,7 @@ export default function OnboardingFlow() {
                   setIsDashboardSpinning(false);
                 }, 500);
               }}
-              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl active:scale-95 transition-all duration-300 flex items-center gap-2 text-xs font-bold shadow-md group"
+                className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg active:scale-95 transition-all duration-300 flex items-center gap-2 text-xs font-bold shadow-md group"
             >
               <Settings className={`w-4 h-4 transition-transform duration-500 ${isDashboardSpinning ? 'rotate-90' : ''}`} />
               <span>Dashboard</span>
@@ -1192,7 +1256,7 @@ export default function OnboardingFlow() {
                   accent: 'border-l-4 border-violet-500',
                   iconBg: 'bg-violet-100',
                   iconColor: 'text-violet-700',
-                  textColor: 'text-gray-900',
+                  textColor: 'text-gray-800',
                   textSecondary: 'text-gray-700',
                   glow: 'bg-violet-100/40',
                   shadow: 'shadow-lg shadow-gray-300/50',
@@ -1203,7 +1267,7 @@ export default function OnboardingFlow() {
                   accent: 'border-l-4 border-purple-500',
                   iconBg: 'bg-purple-100',
                   iconColor: 'text-purple-700',
-                  textColor: 'text-slate-900',
+                  textColor: 'text-gray-800',
                   textSecondary: 'text-slate-700',
                   glow: 'bg-purple-100/40',
                   shadow: 'shadow-lg shadow-slate-300/50 hover:shadow-xl hover:shadow-slate-400/60',
@@ -1317,11 +1381,11 @@ export default function OnboardingFlow() {
                       alert('Processing request string...');
                     }
                   }}
-                  className="flex-1 p-7 bg-white/90 backdrop-blur-md border-2 border-gray-200 text-gray-900 rounded-3xl active:scale-[0.97] transition-all duration-300 flex flex-col items-center justify-center gap-3 shadow-md group"
+                  className="flex-1 p-7 bg-white/90 backdrop-blur-md border-2 border-gray-200 text-gray-800 rounded-3xl active:scale-[0.97] transition-all duration-300 flex flex-col items-center justify-center gap-3 shadow-md group"
                 >
                   <div className="relative flex items-center gap-3">
                     <Copy className="w-6 h-6 text-gray-600 transition-transform duration-300" strokeWidth={2.5} />
-                    <span className="font-bold text-xl tracking-tight">Paste Request String</span>
+                    <span className="font-semibold text-xl tracking-tight">Paste Request String</span>
                   </div>
                   <span className="relative text-sm text-gray-600 font-medium leading-relaxed text-center">Paste a request string to share your credentials</span>
                 </button>
@@ -1335,7 +1399,7 @@ export default function OnboardingFlow() {
                 >
                   <div className="relative flex items-center gap-3">
                     <QrCode className="w-6 h-6 drop-shadow-md transition-transform duration-300" strokeWidth={2.5} />
-                    <span className="font-bold text-xl tracking-tight">Scan to Share</span>
+                    <span className="font-semibold text-xl tracking-tight">Scan to Share</span>
                   </div>
                   <span className="relative text-sm text-white/90 font-medium leading-relaxed text-center">Scan a QR code to share your credentials</span>
                 </button>
