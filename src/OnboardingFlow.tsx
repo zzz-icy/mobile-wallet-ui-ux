@@ -16,7 +16,6 @@ export default function OnboardingFlow() {
   const [flippedCard, setFlippedCard] = useState<string | null>(null);
   const [isDashboardSpinning, setIsDashboardSpinning] = useState(false);
   const [passkeyError, setPasskeyError] = useState<string | null>(null);
-  const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [recoveryCodeInput, setRecoveryCodeInput] = useState('');
   const [recoveryType, setRecoveryType] = useState<'username-only' | 'full-recovery'>('username-only');
