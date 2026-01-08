@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, ArrowLeft, Shield, QrCode, Copy, User, Key, Lock, FileText, Share2, CreditCard, Settings, Plus, Eye } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Shield, QrCode, Copy, User, Key, Lock, FileText, Share2, CreditCard, Settings, Plus } from 'lucide-react';
 import iden2Logo from './iden2_logo.png';
 import iden2FullLogo from './iden2_full_logo.svg';
 
@@ -124,7 +124,7 @@ export default function OnboardingFlow() {
       },
     ];
 
-    const currentSlide = introSlides[introSlide];
+    // const currentSlide = introSlides[introSlide];
 
     return (
       <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto relative overflow-hidden">
